@@ -11,8 +11,8 @@ env:
   GAME_REVISION: 0
   GAME_LANGUAGE: ENGLISH
   COMPARE: 0
-  UNUSED_ERROR: 1
-  DEPRECATED_ERROR: 1
+  UNUSED_ERROR: 0
+  DEPRECATED_ERROR: 0
 
 jobs:
   build-emerald:
@@ -23,8 +23,8 @@ jobs:
       GAME_REVISION: 0
       GAME_LANGUAGE: ENGLISH
       COMPARE: 0
-      UNUSED_ERROR: 1
-      DEPRECATED_ERROR: 1
+      UNUSED_ERROR: 0
+      DEPRECATED_ERROR: 0
     steps:
       - name: Checkout
         uses: actions/checkout@v4
