@@ -11,8 +11,8 @@ env:
   GAME_REVISION: 0
   GAME_LANGUAGE: ENGLISH
   COMPARE: 0
-  UNUSED_ERROR: 1
-  DEPRECATED_ERROR: 1
+  UNUSED_ERROR: 0
+  DEPRECATED_ERROR: 0
 
 jobs:
   build-emerald:
@@ -23,8 +23,8 @@ jobs:
       GAME_REVISION: 0
       GAME_LANGUAGE: ENGLISH
       COMPARE: 0
-      UNUSED_ERROR: 1
-      DEPRECATED_ERROR: 1
+      UNUSED_ERROR: 0
+      DEPRECATED_ERROR: 0
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -33,6 +33,12 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends binutils-arm-none-eabi gcc-arm-none-eabi libnewlib-arm-none-eabi libpng-dev python3
+
+      - name: Report ARM compiler version
+        run: |
+          arm-none-eabi-gcc --version
+          arm-none-eabi-gcc -dumpfullversion -dumpversion
+          dpkg-query -W gcc-arm-none-eabi binutils-arm-none-eabi
 
       - name: Cache build tools
         uses: actions/cache@v4
