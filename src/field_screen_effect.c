@@ -532,14 +532,14 @@ void DoWarp(void)
     gFieldCallback = FieldCB_DefaultWarpExit;
 }
 
-static void FieldCB_InstantWarpExit(void)
+static void __attribute__((unused)) FieldCB_InstantWarpExit(void)
 {
     Overworld_PlaySpecialMapMusic();
     FollowerNPC_WarpSetEnd();
     UnlockPlayerFieldControls();
 }
 
-static void Task_InstantWarpAndLoadMap(u8 taskId)
+static void __attribute__((unused)) Task_InstantWarpAndLoadMap(u8 taskId)
 {
     FreezeObjectEvents();
     LockPlayerFieldControls();
