@@ -1562,6 +1562,9 @@ void CalculateMonStats(struct Pokemon *mon)
         hyperTrained[i] = GetMonData(mon, MON_DATA_HYPER_TRAINED_HP + i);
         iv[i] = GetMonData(mon, MON_DATA_HP_IV + i);
         ev[i] = GetMonData(mon, MON_DATA_HP_EV + i);
+        // Preserve the stored 8-bit EV; only boost its stat calculation at the cap.
+        if (ev[i] == 255)
+            ev[i] = 999;
 
         if (hyperTrained[i])
         {
