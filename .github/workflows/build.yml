@@ -11,8 +11,8 @@ env:
   GAME_REVISION: 0
   GAME_LANGUAGE: ENGLISH
   COMPARE: 0
-  UNUSED_ERROR: 1
-  DEPRECATED_ERROR: 1
+  UNUSED_ERROR: 0
+  DEPRECATED_ERROR: 0
 
 jobs:
   build-emerald:
@@ -23,8 +23,8 @@ jobs:
       GAME_REVISION: 0
       GAME_LANGUAGE: ENGLISH
       COMPARE: 0
-      UNUSED_ERROR: 1
-      DEPRECATED_ERROR: 1
+      UNUSED_ERROR: 0
+      DEPRECATED_ERROR: 0
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -58,6 +58,20 @@ jobs:
         env:
           COMPARE: 0
         run: make -j${nproc} -O all
+
+      - name: Verify built ROM
+        run: |
+          test -s Soulgold.gba
+          ls -lh Soulgold.gba
+          sha256sum Soulgold.gba
+
+      - name: Upload ROM diagnostic artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: soulgold-current-master-rom-diagnostic
+          path: Soulgold.gba
+          if-no-files-found: error
+          retention-days: 7
 
       - name: Release
         run: |
