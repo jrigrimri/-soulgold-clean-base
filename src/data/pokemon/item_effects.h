@@ -1,6 +1,6 @@
 const u8 gItemEffect_Potion[ITEM_EFFECT_COUNT] = {
     [4] = ITEM4_HEAL_HP,
-    [6] = 20, // Amount of HP to recover
+    [6] = 50, // Amount of HP to recover
 };
 
 const u8 gItemEffect_Antidote[ITEM_EFFECT_COUNT] = {
@@ -36,12 +36,12 @@ const u8 gItemEffect_MaxPotion[ITEM_EFFECT_COUNT] = {
 
 const u8 gItemEffect_HyperPotion[ITEM_EFFECT_COUNT] = {
     [4] = ITEM4_HEAL_HP,
-    [6] = I_HEALTH_RECOVERY >= GEN_7 ? 120 : 200, // Amount of HP to recover
+    [6] = 250, // Amount of HP to recover
 };
 
 const u8 gItemEffect_SuperPotion[ITEM_EFFECT_COUNT] = {
     [4] = ITEM4_HEAL_HP,
-    [6] = I_HEALTH_RECOVERY >= GEN_7 ? 60 : 50, // Amount of HP to recover
+    [6] = 200, // Amount of HP to recover
 };
 
 const u8 gItemEffect_FullHeal[ITEM_EFFECT_COUNT] = {
@@ -50,7 +50,7 @@ const u8 gItemEffect_FullHeal[ITEM_EFFECT_COUNT] = {
 
 const u8 gItemEffect_Revive[ITEM_EFFECT_COUNT] = {
     [4] = ITEM4_REVIVE | ITEM4_HEAL_HP,
-    [6] = ITEM6_HEAL_HP_HALF,
+    [6] = ITEM6_HEAL_HP_FULL,
 };
 
 const u8 gItemEffect_MaxRevive[ITEM_EFFECT_COUNT] = {
@@ -60,28 +60,28 @@ const u8 gItemEffect_MaxRevive[ITEM_EFFECT_COUNT] = {
 
 const u8 gItemEffect_FreshWater[ITEM_EFFECT_COUNT] = {
     [4] = ITEM4_HEAL_HP,
-    [6] = I_HEALTH_RECOVERY >= GEN_7 ? 30 : 50, // Amount of HP to recover
+    [6] = 100, // Amount of HP to recover
 };
 
 const u8 gItemEffect_SodaPop[ITEM_EFFECT_COUNT] = {
     [4] = ITEM4_HEAL_HP,
-    [6] = I_HEALTH_RECOVERY >= GEN_7 ? 50 : 60, // Amount of HP to recover
+    [6] = 150, // Amount of HP to recover
 };
 
 const u8 gItemEffect_Lemonade[ITEM_EFFECT_COUNT] = {
     [4] = ITEM4_HEAL_HP,
-    [6] = I_HEALTH_RECOVERY >= GEN_7 ? 70 : 80, // Amount of HP to recover
+    [6] = 200, // Amount of HP to recover
 };
 
 const u8 gItemEffect_MoomooMilk[ITEM_EFFECT_COUNT] = {
     [4] = ITEM4_HEAL_HP,
-    [6] = 100, // Amount of HP to recover
+    [6] = 250, // Amount of HP to recover
 };
 
 const u8 gItemEffect_EnergyPowder[ITEM_EFFECT_COUNT] = {
     [4] = ITEM4_HEAL_HP,
     [5] = ITEM5_FRIENDSHIP_ALL,
-    [6] = I_HEALTH_RECOVERY >= GEN_7 ? 60 : 50, // Amount of HP to recover
+    [6] = 200, // Amount of HP to recover
     [7] = -5, // Friendship change, low
     [8] = -5, // Friendship change, mid
     [9] = -10, // Friendship change, high
@@ -90,7 +90,7 @@ const u8 gItemEffect_EnergyPowder[ITEM_EFFECT_COUNT] = {
 const u8 gItemEffect_EnergyRoot[ITEM_EFFECT_COUNT] = {
     [4] = ITEM4_HEAL_HP,
     [5] = ITEM5_FRIENDSHIP_ALL,
-    [6] = I_HEALTH_RECOVERY >= GEN_7 ? 120 : 200, // Amount of HP to recover
+    [6] = 250, // Amount of HP to recover
     [7] = -10, // Friendship change, low
     [8] = -10, // Friendship change, mid
     [9] = -15, // Friendship change, high
@@ -142,7 +142,7 @@ const u8 gItemEffect_SuperbRemedy[ITEM_EFFECT_COUNT] = {
 
 const u8 gItemEffect_Ether[ITEM_EFFECT_COUNT] = {
     [4] = ITEM4_HEAL_PP_ONE | ITEM4_HEAL_PP,
-    [6] = 10,
+    [6] = 20,
 };
 
 const u8 gItemEffect_MaxEther[ITEM_EFFECT_COUNT] = {
@@ -152,7 +152,7 @@ const u8 gItemEffect_MaxEther[ITEM_EFFECT_COUNT] = {
 
 const u8 gItemEffect_Elixir[ITEM_EFFECT_COUNT] = {
     [4] = ITEM4_HEAL_PP,
-    [6] = 10, // Amount of PP to recover
+    [6] = 20, // Amount of PP to recover
 };
 
 const u8 gItemEffect_MaxElixir[ITEM_EFFECT_COUNT] = {

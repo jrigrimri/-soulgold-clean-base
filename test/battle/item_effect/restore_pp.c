@@ -1,7 +1,7 @@
 #include "global.h"
 #include "test/battle.h"
 
-SINGLE_BATTLE_TEST("Ether restores the PP of one of a battler's moves by 10 ")
+SINGLE_BATTLE_TEST("Ether restores the PP of one of a battler's moves by 20 ")
 {
     GIVEN {
         ASSUME(gItemsInfo[ITEM_ETHER].battleUsage == EFFECT_ITEM_RESTORE_PP);
@@ -11,7 +11,7 @@ SINGLE_BATTLE_TEST("Ether restores the PP of one of a battler's moves by 10 ")
     } WHEN {
         TURN { USE_ITEM(player, ITEM_ETHER, partyIndex: 0, move: MOVE_SCRATCH); }
     } THEN {
-        EXPECT_EQ(player->pp[0], 10);
+        EXPECT_EQ(player->pp[0], 20);
         EXPECT_EQ(player->pp[1], 20);
     }
 }
@@ -31,7 +31,7 @@ SINGLE_BATTLE_TEST("Max Ether restores the PP of one of a battler's moves fully"
     }
 }
 
-SINGLE_BATTLE_TEST("Elixir restores the PP of all of a battler's moves by 10")
+SINGLE_BATTLE_TEST("Elixir restores the PP of all of a battler's moves by 20")
 {
     GIVEN {
         ASSUME(gItemsInfo[ITEM_ELIXIR].battleUsage == EFFECT_ITEM_RESTORE_PP);
@@ -41,10 +41,10 @@ SINGLE_BATTLE_TEST("Elixir restores the PP of all of a battler's moves by 10")
     } WHEN {
         TURN { USE_ITEM(player, ITEM_ELIXIR, partyIndex: 0); }
     } THEN {
-        EXPECT_EQ(player->pp[0], 10);
-        EXPECT_EQ(player->pp[1], 10);
-        EXPECT_EQ(player->pp[2], 10);
-        EXPECT_EQ(player->pp[3], 10);
+        EXPECT_EQ(player->pp[0], 20);
+        EXPECT_EQ(player->pp[1], 20);
+        EXPECT_EQ(player->pp[2], 20);
+        EXPECT_EQ(player->pp[3], 20);
     }
 }
 
