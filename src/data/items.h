@@ -850,7 +850,7 @@ const struct ItemInfo gItemsInfo[] =
         .price = (I_PRICE >= GEN_7) ? 2000 : 1500,
         .description = COMPOUND_STRING(
             "Revives a fainted\n"
-            "Pokémon with half\n"
+            "Pokémon with full\n"
             "its HP."),
         .pocket = POCKET_MEDICINE,
         .sortType = ITEM_TYPE_HEALTH_RECOVERY,
@@ -1179,11 +1179,11 @@ const struct ItemInfo gItemsInfo[] =
     {
         .name = ITEM_NAME("Ether"),
         .price = (I_PRICE >= GEN_2) ? 1200 : 1,
-        .holdEffectParam = 10,
+        .holdEffectParam = 40,
         .description = COMPOUND_STRING(
             "Restores the PP\n"
             "of a selected move\n"
-            "by 10."),
+            "by 40."),
         .pocket = POCKET_MEDICINE,
         .sortType = ITEM_TYPE_PP_RECOVERY,
         .heldSlot = 0,
@@ -1221,10 +1221,10 @@ const struct ItemInfo gItemsInfo[] =
     {
         .name = ITEM_NAME("Elixir"),
         .price = (I_PRICE >= GEN_2) ? 3000 : 1,
-        .holdEffectParam = 10,
+        .holdEffectParam = 40,
         .description = COMPOUND_STRING(
             "Restores the PP\n"
-            "of all moves by 10."),
+            "of all moves by 40."),
         .pocket = POCKET_MEDICINE,
         .sortType = ITEM_TYPE_PP_RECOVERY,
         .heldSlot = 0,
