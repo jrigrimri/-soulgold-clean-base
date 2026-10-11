@@ -50,7 +50,7 @@ const u8 gItemEffect_FullHeal[ITEM_EFFECT_COUNT] = {
 
 const u8 gItemEffect_Revive[ITEM_EFFECT_COUNT] = {
     [4] = ITEM4_REVIVE | ITEM4_HEAL_HP,
-    [6] = ITEM6_HEAL_HP_HALF,
+    [6] = ITEM6_HEAL_HP_FULL,
 };
 
 const u8 gItemEffect_MaxRevive[ITEM_EFFECT_COUNT] = {
@@ -142,7 +142,7 @@ const u8 gItemEffect_SuperbRemedy[ITEM_EFFECT_COUNT] = {
 
 const u8 gItemEffect_Ether[ITEM_EFFECT_COUNT] = {
     [4] = ITEM4_HEAL_PP_ONE | ITEM4_HEAL_PP,
-    [6] = 10,
+    [6] = 40,
 };
 
 const u8 gItemEffect_MaxEther[ITEM_EFFECT_COUNT] = {
@@ -152,7 +152,7 @@ const u8 gItemEffect_MaxEther[ITEM_EFFECT_COUNT] = {
 
 const u8 gItemEffect_Elixir[ITEM_EFFECT_COUNT] = {
     [4] = ITEM4_HEAL_PP,
-    [6] = 10, // Amount of PP to recover
+    [6] = 40, // Amount of PP to recover
 };
 
 const u8 gItemEffect_MaxElixir[ITEM_EFFECT_COUNT] = {
