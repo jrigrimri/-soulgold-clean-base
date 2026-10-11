@@ -1,6 +1,6 @@
 const u8 gItemEffect_Potion[ITEM_EFFECT_COUNT] = {
     [4] = ITEM4_HEAL_HP,
-    [6] = 20, // Amount of HP to recover
+    [6] = 50, // Amount of HP to recover
 };
 
 const u8 gItemEffect_Antidote[ITEM_EFFECT_COUNT] = {
