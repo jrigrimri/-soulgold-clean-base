@@ -1179,11 +1179,11 @@ const struct ItemInfo gItemsInfo[] =
     {
         .name = ITEM_NAME("Ether"),
         .price = (I_PRICE >= GEN_2) ? 1200 : 1,
-        .holdEffectParam = 40,
+        .holdEffectParam = 20,
         .description = COMPOUND_STRING(
             "Restores the PP\n"
             "of a selected move\n"
-            "by 40."),
+            "by 20."),
         .pocket = POCKET_MEDICINE,
         .sortType = ITEM_TYPE_PP_RECOVERY,
         .heldSlot = 0,
@@ -1221,10 +1221,10 @@ const struct ItemInfo gItemsInfo[] =
     {
         .name = ITEM_NAME("Elixir"),
         .price = (I_PRICE >= GEN_2) ? 3000 : 1,
-        .holdEffectParam = 40,
+        .holdEffectParam = 20,
         .description = COMPOUND_STRING(
             "Restores the PP\n"
-            "of all moves by 40."),
+            "of all moves by 20."),
         .pocket = POCKET_MEDICINE,
         .sortType = ITEM_TYPE_PP_RECOVERY,
         .heldSlot = 0,
