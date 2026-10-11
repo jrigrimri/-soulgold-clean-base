@@ -744,11 +744,11 @@ const struct ItemInfo gItemsInfo[] =
     {
         .name = ITEM_NAME("Potion"),
         .price = (I_PRICE >= GEN_7) ? 200 : 300,
-        .holdEffectParam = 20,
+        .holdEffectParam = 50,
         .description = COMPOUND_STRING(
             "Restores the HP of\n"
             "a Pokémon by\n"
-            "20 points."),
+            "50 points."),
         .pocket = POCKET_MEDICINE,
         .sortType = ITEM_TYPE_HEALTH_RECOVERY,
         .heldSlot = 0,
@@ -1291,11 +1291,11 @@ const struct ItemInfo gItemsInfo[] =
         .name = ITEM_NAME("Berry Juice"),
         .price = 100,
         .holdEffect = HOLD_EFFECT_RESTORE_HP,
-        .holdEffectParam = 20,
+        .holdEffectParam = 50,
         .description = COMPOUND_STRING(
             "A 100% pure juice\n"
             "that restores HP\n"
-            "by 20 points."),
+            "by 50 points."),
         .pocket = POCKET_MEDICINE,
         .sortType = ITEM_TYPE_HEALTH_RECOVERY,
         .heldSlot = 0,
@@ -1332,11 +1332,11 @@ const struct ItemInfo gItemsInfo[] =
     {
         .name = ITEM_NAME("Sweet Heart"),
         .price = (I_PRICE >= GEN_7) ? 3000 : 100,
-        .holdEffectParam = 20,
+        .holdEffectParam = 50,
         .description = COMPOUND_STRING(
             "A sweet chocolate\n"
             "that restores HP\n"
-            "by 20 points."),
+            "by 50 points."),
         .pocket = POCKET_MEDICINE,
         .sortType = ITEM_TYPE_HEALTH_RECOVERY,
         .heldSlot = 0,
