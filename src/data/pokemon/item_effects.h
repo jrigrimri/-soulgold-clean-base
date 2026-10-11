@@ -142,7 +142,7 @@ const u8 gItemEffect_SuperbRemedy[ITEM_EFFECT_COUNT] = {
 
 const u8 gItemEffect_Ether[ITEM_EFFECT_COUNT] = {
     [4] = ITEM4_HEAL_PP_ONE | ITEM4_HEAL_PP,
-    [6] = 40,
+    [6] = 20,
 };
 
 const u8 gItemEffect_MaxEther[ITEM_EFFECT_COUNT] = {
@@ -152,7 +152,7 @@ const u8 gItemEffect_MaxEther[ITEM_EFFECT_COUNT] = {
 
 const u8 gItemEffect_Elixir[ITEM_EFFECT_COUNT] = {
     [4] = ITEM4_HEAL_PP,
-    [6] = 40, // Amount of PP to recover
+    [6] = 20, // Amount of PP to recover
 };
 
 const u8 gItemEffect_MaxElixir[ITEM_EFFECT_COUNT] = {
