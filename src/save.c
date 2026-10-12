@@ -361,9 +361,14 @@ void ClearSaveData(void)
     }
 }
 
-void Save_ResetSaveCounters(void)
+void CustomAbilityStorageReset(void)
 {
     memset(&sCustomAbilityTail, 0, sizeof(sCustomAbilityTail));
+}
+
+void Save_ResetSaveCounters(void)
+{
+    CustomAbilityStorageReset();
     gSaveCounter = 0;
     gLastWrittenSector = 0;
     gDamagedSaveSectors = 0;
