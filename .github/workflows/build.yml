@@ -5,6 +5,7 @@ on:
     branches:
       - master
       - upcoming
+      - feature/custom-primary-ability-test-v1
   pull_request:
 
 env:
