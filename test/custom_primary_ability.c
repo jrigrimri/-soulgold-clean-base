@@ -6,7 +6,7 @@
 #include "constants/abilities.h"
 #include "constants/species.h"
 
-// Phase 2: exercise the API without modifying battle or summary behavior.
+// Phase 2 regression: collision fail-closed and New Game reset; no battle or summary changes.
 // Each test starts with an empty in-memory override table.
 static void SetupCustomAbilityTest(void)
 {
