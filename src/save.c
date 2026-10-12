@@ -15,6 +15,7 @@
 #include "constants/game_stat.h"
 
 static u16 CalculateChecksum(void *, u16);
+static bool8 IsZeroed(const u8 *, u16);
 static bool8 ReadFlashSector(u8, struct SaveSector *);
 static u8 GetSaveValidStatus(const struct SaveSectorLocation *);
 static u8 CopySaveSlotData(u16, struct SaveSectorLocation *);
