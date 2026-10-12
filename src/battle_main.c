@@ -3687,6 +3687,9 @@ static void DoBattleIntro(void)
                 gBattleMons[battler].types[1] = GetSpeciesType(gBattleMons[battler].species, 1);
                 gBattleMons[battler].types[2] = TYPE_MYSTERY;
                 gBattleMons[battler].ability = GetAbilityBySpecies(gBattleMons[battler].species, gBattleMons[battler].abilityNum);
+                // Battle intro rebuilds the ability from species; restore player-only override here.
+                if (IsOnPlayerSide(battler) && gBattlerPartyIndexes[battler] < PARTY_SIZE)
+                    gBattleMons[battler].ability = GetEffectivePrimaryAbility(&gPlayerParty[gBattlerPartyIndexes[battler]]);
                 gBattleStruct->battlerState[battler].hpOnSwitchout = gBattleMons[battler].hp;
                 memset(&gBattleMons[battler].volatiles, 0, sizeof(struct Volatiles));
                 for (i = 0; i < NUM_BATTLE_STATS; i++)
