@@ -284,6 +284,9 @@ void NewGameInitData(void)
     gPlayerPartyCount = 0;
     ZeroPlayerPartyMons();
     ResetPokemonStorageSystem();
+    // New Game must not inherit overrides from a previously loaded save.
+    // Keep save counters intact; only clear the custom ability table.
+    CustomAbilityStorageReset();
     ResetHallOfFameArchive();
     DeactivateAllRoamers();
     gSaveBlock1Ptr->registeredItemCompat = ITEM_NONE;
