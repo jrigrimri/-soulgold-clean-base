@@ -149,6 +149,43 @@ STATIC_ASSERT(sizeof(struct SaveBlock1) == 0x3C54, SaveBlock1LegacySize);
 #define PKMN_STORAGE_EXTENSION_SECTOR_OFFSET (offsetof(struct PokemonStorage, boxExtensionMagic) - (SECTOR_DATA_SIZE * (SECTOR_ID_PKMN_STORAGE_END - SECTOR_ID_PKMN_STORAGE_START)))
 
 #define BX19_SCHEMA_VERSION 1
+// Test V1: versioned tail stored outside the BX19 payload, inside its sector checksum.
+#define CUSTOM_ABILITY_MAGIC 0x31424143
+#define CUSTOM_ABILITY_VERSION 1
+#define CUSTOM_ABILITY_ENTRY_COUNT 4
+
+struct CustomAbilityEntry
+{
+    u32 personality;
+    u32 otId;
+    u16 ability;
+    u16 reserved;
+};
+
+struct CustomAbilityTail
+{
+    u32 magic;
+    u16 version;
+    u16 count;
+    struct CustomAbilityEntry entries[CUSTOM_ABILITY_ENTRY_COUNT];
+    u16 checksum;
+    u8 reserved[18];
+};
+
+STATIC_ASSERT(sizeof(struct CustomAbilityTail) == 76, CustomAbilityTailSize);
+static struct CustomAbilityTail sCustomAbilityTail;
+
+static bool8 IsCustomAbilityTailValid(const struct CustomAbilityTail *tail)
+{
+    if (IsZeroed(tail, sizeof(*tail)))
+        return TRUE;
+    return tail->magic == CUSTOM_ABILITY_MAGIC
+        && tail->version == CUSTOM_ABILITY_VERSION
+        && tail->count <= CUSTOM_ABILITY_ENTRY_COUNT
+        && IsZeroed(tail->reserved, sizeof(tail->reserved))
+        && tail->checksum == CalculateChecksum((void *)tail, offsetof(struct CustomAbilityTail, checksum));
+}
+
 
 struct Bx19AuxiliaryRecord
 {
@@ -445,6 +482,9 @@ static u8 WriteBx19AuxiliarySector(void)
         record->hallOfFame = *sLegacyHallOfFameRetryArchive;
     }
 
+    if (!IsCustomAbilityTailValid(&sCustomAbilityTail))
+        return SAVE_STATUS_ERROR;
+    memcpy(&gReadWriteSector->data[sizeof(*record)], &sCustomAbilityTail, sizeof(sCustomAbilityTail));
     record->checksum = CalculateChecksum(&record->box19, record->payloadLength);
     record->checksumInverse = (u16)~record->checksum;
     gReadWriteSector->id = sectorId;
@@ -508,7 +548,7 @@ static bool8 IsBx19AuxiliarySectorValid(u8 slotId, u32 counter)
      || record->checksum != CalculateChecksum(&record->box19, record->payloadLength)
      || record->hallOfFame.count > HALL_OF_FAME_RETAINED_TEAMS
      || !IsZeroed(record->hallOfFame.reserved, sizeof(record->hallOfFame.reserved))
-     || !IsZeroed(&gReadWriteSector->data[sizeof(*record)], SECTOR_DATA_SIZE - sizeof(*record)))
+     || !IsCustomAbilityTailValid((const struct CustomAbilityTail *)&gReadWriteSector->data[sizeof(*record)]))
         return FALSE;
 
     return TRUE;
@@ -615,6 +655,7 @@ static void LoadPokemonStorageOverflow(void)
     u8 overflowSector;
     enum PokemonStorageOverflowStatus status;
 
+    memset(&sCustomAbilityTail, 0, sizeof(sCustomAbilityTail));
     if (gPokemonStoragePtr->boxExtensionMagic != POKEMON_STORAGE_EXTENSION_MAGIC)
     {
         InitPokemonStorageExtension();
@@ -669,6 +710,7 @@ static void LoadPokemonStorageOverflow(void)
             ReadFlashSector(SECTOR_ID_BX19_AUXILIARY_1 + slotId, gReadWriteSector);
             record = (struct Bx19AuxiliaryRecord *)gReadWriteSector->data;
             memcpy(&gPokemonStoragePtr->box19, &record->box19, PKMN_STORAGE_BOX19_RECORD_SIZE);
+            memcpy(&sCustomAbilityTail, &gReadWriteSector->data[sizeof(*record)], sizeof(sCustomAbilityTail));
         }
     }
 }
