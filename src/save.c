@@ -183,6 +183,10 @@ static bool8 IsCustomAbilityTailValid(const struct CustomAbilityTail *tail)
     return tail->magic == CUSTOM_ABILITY_MAGIC
         && tail->version == CUSTOM_ABILITY_VERSION
         && tail->count <= CUSTOM_ABILITY_ENTRY_COUNT
+        && (tail->count == 0 || (tail->entries[0].ability != ABILITY_NONE && tail->entries[0].ability < ABILITIES_COUNT))
+        && (tail->count <= 1 || (tail->entries[1].ability != ABILITY_NONE && tail->entries[1].ability < ABILITIES_COUNT))
+        && (tail->count <= 2 || (tail->entries[2].ability != ABILITY_NONE && tail->entries[2].ability < ABILITIES_COUNT))
+        && (tail->count <= 3 || (tail->entries[3].ability != ABILITY_NONE && tail->entries[3].ability < ABILITIES_COUNT))
         && IsZeroed(tail->reserved, sizeof(tail->reserved))
         && tail->checksum == CalculateChecksum((void *)tail, offsetof(struct CustomAbilityTail, checksum));
 }
