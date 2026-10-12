@@ -2421,3 +2421,84 @@ TEST("Custom Ability BX19 identity keys cannot distinguish clones")
     EXPECT(CustomAbilityStorageGet(0x12345678, 0x9ABCDEF0, &ability));
     EXPECT_EQ(ability, ABILITY_MAGIC_GUARD);
 }
+
+/* Corrupt each BX19 override-tail field independently, including a structurally
+ * checksummed but semantically invalid ability ID. */
+TEST("Custom Ability BX19 rejects malformed tail fields")
+{
+    struct SaveSector *sector;
+    u16 ability = ABILITY_NONE;
+    u8 kind;
+    gTestRunnerState.timeoutSeconds = 120;
+    sector = Alloc(sizeof(*sector));
+    for (kind = 0; kind < 5; kind++)
+    {
+        u8 *tail;
+        ResetPokemonStorageTestFlash();
+        ResetPokemonStorageSystem();
+        EXPECT(CustomAbilityStorageSet(0x11223344, 0x55667788, ABILITY_WONDER_GUARD));
+        EXPECT_EQ(TrySavingData(SAVE_NORMAL), SAVE_STATUS_OK);
+        ReadNewestAuxiliarySector(sector);
+        tail = &sector->data[SECTOR_DATA_SIZE - 76];
+        switch (kind)
+        {
+        case 0: tail[0] ^= 1; break; // Magic
+        case 1: tail[4] ^= 1; break; // Version
+        case 2: tail[6] = 5; break; // Count exceeds four
+        case 3: tail[56] ^= 1; break; // Tail checksum
+        case 4:
+            // First entry's ability is at offset 16. Recompute the tail
+            // checksum so this case exercises ability-ID validation itself.
+            tail[16] = 0;
+            tail[17] = 0;
+            *(u16 *)&tail[56] = CalculateTestSaveChecksum(tail, 56);
+            break;
+        }
+        sector->checksum = CalculateTestSaveChecksum(sector->data, SECTOR_DATA_SIZE);
+        EXPECT_EQ(ProgramFlashSectorAndVerify(GetNewestAuxiliarySectorId(), (u8 *)sector), 0);
+        Save_ResetSaveCounters();
+        EXPECT_EQ(LoadGameSave(SAVE_NORMAL), SAVE_STATUS_CORRUPT);
+        EXPECT(!CustomAbilityStorageGet(0x11223344, 0x55667788, &ability));
+    }
+    Free(sector);
+}
+
+TEST("Custom Ability BX19 switches save slots without losing overrides")
+{
+    u16 ability = ABILITY_NONE;
+    gTestRunnerState.timeoutSeconds = 120;
+    ResetPokemonStorageTestFlash();
+    ResetPokemonStorageSystem();
+    EXPECT(CustomAbilityStorageSet(0x11223344, 0x55667788, ABILITY_WONDER_GUARD));
+    EXPECT_EQ(TrySavingData(SAVE_NORMAL), SAVE_STATUS_OK);
+    EXPECT(CustomAbilityStorageSet(0x11223344, 0x55667788, ABILITY_MAGIC_GUARD));
+    EXPECT_EQ(TrySavingData(SAVE_NORMAL), SAVE_STATUS_OK);
+    Save_ResetSaveCounters();
+    EXPECT_EQ(LoadGameSave(SAVE_NORMAL), SAVE_STATUS_OK);
+    EXPECT(CustomAbilityStorageGet(0x11223344, 0x55667788, &ability));
+    EXPECT_EQ(ability, ABILITY_MAGIC_GUARD);
+}
+
+TEST("Custom Ability BX19 recovers prior slot when newest tail is corrupt")
+{
+    struct SaveSector *sector;
+    u16 ability = ABILITY_NONE;
+    gTestRunnerState.timeoutSeconds = 120;
+    ResetPokemonStorageTestFlash();
+    ResetPokemonStorageSystem();
+    EXPECT(CustomAbilityStorageSet(0x11223344, 0x55667788, ABILITY_WONDER_GUARD));
+    EXPECT_EQ(TrySavingData(SAVE_NORMAL), SAVE_STATUS_OK);
+    EXPECT(CustomAbilityStorageSet(0x11223344, 0x55667788, ABILITY_MAGIC_GUARD));
+    EXPECT_EQ(TrySavingData(SAVE_NORMAL), SAVE_STATUS_OK);
+    sector = Alloc(sizeof(*sector));
+    ReadNewestAuxiliarySector(sector);
+    sector->data[SECTOR_DATA_SIZE - 76] ^= 1;
+    sector->checksum = CalculateTestSaveChecksum(sector->data, SECTOR_DATA_SIZE);
+    EXPECT_EQ(ProgramFlashSectorAndVerify(GetNewestAuxiliarySectorId(), (u8 *)sector), 0);
+    Save_ResetSaveCounters();
+    // One slot is invalid, so loader signals an error but selects the older one.
+    EXPECT_EQ(LoadGameSave(SAVE_NORMAL), SAVE_STATUS_ERROR);
+    EXPECT(CustomAbilityStorageGet(0x11223344, 0x55667788, &ability));
+    EXPECT_EQ(ability, ABILITY_WONDER_GUARD);
+    Free(sector);
+}
