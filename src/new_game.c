@@ -287,6 +287,12 @@ void NewGameInitData(void)
     // New Game must not inherit overrides from a previously loaded save.
     // Keep save counters intact; only clear the custom ability table.
     CustomAbilityStorageReset();
+    // Temporary battle POC: give a fresh game a Combusken with Wonder Guard.
+    // Remove this block after validating the ability in an emulator.
+    CreateMon(&gPlayerParty[0], SPECIES_COMBUSKEN, 20, 0, OTID_STRUCT_PLAYER_ID);
+    GiveMonInitialMoveset(&gPlayerParty[0]);
+    gPlayerPartyCount = 1;
+    SetCustomPrimaryAbility(&gPlayerParty[0], ABILITY_WONDER_GUARD);
     ResetHallOfFameArchive();
     DeactivateAllRoamers();
     gSaveBlock1Ptr->registeredItemCompat = ITEM_NONE;
