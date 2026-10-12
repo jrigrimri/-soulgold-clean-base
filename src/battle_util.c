@@ -12426,7 +12426,9 @@ void CopyMonLevelAndBaseStatsToBattleMon(enum BattlerId battler, struct Pokemon 
 
 void CopyMonAbilityAndTypesToBattleMon(enum BattlerId battler, struct Pokemon *mon)
 {
-    gBattleMons[battler].ability = GetMonAbility(mon);
+    // Battle proof of concept: resolve player-party custom primary abilities.
+    // Enemy Pokemon and all innates continue using their original behavior.
+    gBattleMons[battler].ability = GetEffectivePrimaryAbility(mon);
     #if TESTING
     if (gTestRunnerEnabled)
     {
