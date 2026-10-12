@@ -178,7 +178,7 @@ static struct CustomAbilityTail sCustomAbilityTail;
 
 static bool8 IsCustomAbilityTailValid(const struct CustomAbilityTail *tail)
 {
-    if (IsZeroed(tail, sizeof(*tail)))
+    if (IsZeroed((const u8 *)tail, sizeof(*tail)))
         return TRUE;
     return tail->magic == CUSTOM_ABILITY_MAGIC
         && tail->version == CUSTOM_ABILITY_VERSION
