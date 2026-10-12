@@ -102,3 +102,35 @@ TEST("Custom Primary Ability reset clears in-memory storage")
     Save_ResetSaveCounters();
     EXPECT(!CustomAbilityStorageGet(123, 456, &stored));
 }
+
+TEST("Custom Primary Ability reset prevents stale identity reuse")
+{
+    u32 pid;
+    u32 otId;
+    u16 stored = ABILITY_NONE;
+    SetupCustomAbilityTest();
+    pid = GetMonData(&gPlayerParty[0], MON_DATA_PERSONALITY);
+    otId = GetMonData(&gPlayerParty[0], MON_DATA_OT_ID);
+    EXPECT(SetCustomPrimaryAbility(&gPlayerParty[0], ABILITY_WONDER_GUARD));
+    EXPECT_EQ(GetEffectivePrimaryAbility(&gPlayerParty[0]), ABILITY_WONDER_GUARD);
+    // New-game reset must clear the previous save's in-memory override table.
+    Save_ResetSaveCounters();
+    CreateMon(&gPlayerParty[0], SPECIES_UMBREON, 30, 0, OTID_STRUCT_PLAYER_ID);
+    EXPECT(!CustomAbilityStorageGet(pid, otId, &stored));
+    EXPECT_EQ(GetEffectivePrimaryAbility(&gPlayerParty[0]), GetMonAbility(&gPlayerParty[0]));
+}
+
+TEST("Custom Primary Ability storage capacity recovers after clearing")
+{
+    u32 i;
+    u16 ability = ABILITY_NONE;
+    SetupCustomAbilityTest();
+    for (i = 1; i <= 4; i++)
+        EXPECT(CustomAbilityStorageSet(i, 4321, ABILITY_WONDER_GUARD));
+    EXPECT(!CustomAbilityStorageSet(5, 4321, ABILITY_MAGIC_GUARD));
+    EXPECT(CustomAbilityStorageClear(2, 4321));
+    EXPECT(CustomAbilityStorageSet(5, 4321, ABILITY_MAGIC_GUARD));
+    EXPECT(!CustomAbilityStorageGet(2, 4321, &ability));
+    EXPECT(CustomAbilityStorageGet(5, 4321, &ability));
+    EXPECT_EQ(ability, ABILITY_MAGIC_GUARD);
+}
