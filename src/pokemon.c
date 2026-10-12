@@ -3150,6 +3150,58 @@ enum Ability GetAbilityBySpecies(u16 species, u8 abilityNum)
     return gLastUsedAbility;
 }
 
+// Phase 2 is player-party-only until storage identity supports PC boxes.
+static bool8 IsPlayerPartyMon(const struct Pokemon *mon)
+{
+    u32 i;
+    for (i = 0; i < PARTY_SIZE; i++)
+        if (mon == &gPlayerParty[i])
+            return TRUE;
+    return FALSE;
+}
+
+bool8 TryGetCustomPrimaryAbility(struct Pokemon *mon, enum Ability *ability)
+{
+    u16 stored;
+    if (ability == NULL || !IsPlayerPartyMon(mon)
+     || GetMonData(mon, MON_DATA_SPECIES) == SPECIES_NONE
+     || GetMonData(mon, MON_DATA_IS_EGG))
+        return FALSE;
+    if (!CustomAbilityStorageGet(GetMonData(mon, MON_DATA_PERSONALITY),
+                                 GetMonData(mon, MON_DATA_OT_ID), &stored))
+        return FALSE;
+    *ability = stored;
+    return TRUE;
+}
+
+bool8 SetCustomPrimaryAbility(struct Pokemon *mon, enum Ability ability)
+{
+    if (!IsPlayerPartyMon(mon)
+     || GetMonData(mon, MON_DATA_SPECIES) == SPECIES_NONE
+     || GetMonData(mon, MON_DATA_IS_EGG))
+        return FALSE;
+    return CustomAbilityStorageSet(GetMonData(mon, MON_DATA_PERSONALITY),
+                                   GetMonData(mon, MON_DATA_OT_ID), ability);
+}
+
+bool8 ClearCustomPrimaryAbility(struct Pokemon *mon)
+{
+    if (!IsPlayerPartyMon(mon)
+     || GetMonData(mon, MON_DATA_SPECIES) == SPECIES_NONE)
+        return FALSE;
+    return CustomAbilityStorageClear(GetMonData(mon, MON_DATA_PERSONALITY),
+                                     GetMonData(mon, MON_DATA_OT_ID));
+}
+
+enum Ability GetEffectivePrimaryAbility(struct Pokemon *mon)
+{
+    enum Ability ability;
+    if (TryGetCustomPrimaryAbility(mon, &ability))
+        return ability;
+    return GetAbilityBySpecies(GetMonData(mon, MON_DATA_SPECIES),
+                               GetMonData(mon, MON_DATA_ABILITY_NUM));
+}
+
 enum Ability GetMonAbility(struct Pokemon *mon)
 {
     u16 species = GetMonData(mon, MON_DATA_SPECIES);
