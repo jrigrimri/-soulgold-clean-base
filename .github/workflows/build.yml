@@ -101,6 +101,11 @@ jobs:
             tools/mgba-rom-test-hydra/mgba-rom-test-hydra
           key: tools-check-${{ runner.os }}-${{ hashFiles('tools/*/Makefile', 'tools/**/*.c', 'tools/**/*.cpp', 'tools/**/*.h') }}
 
+      - name: Custom Ability persistence tests
+        env:
+          TEST: 1
+        run: make -j$(nproc) check TESTS='Custom Ability BX19'
+
       - name: Test
         env:
           TEST: 1
