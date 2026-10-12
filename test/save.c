@@ -19,6 +19,7 @@
 #include "test/test.h"
 #include "constants/characters.h"
 #include "constants/game_stat.h"
+#include "constants/abilities.h"
 
 // If you would like to ensure save compatibility, update the values below with those for your hack. You can find these through the debug menu.
 // Please note that this simple check is not 100% foolproof, but should be able to catch most unintended shifts.
@@ -2356,3 +2357,65 @@ TEST("Pokemon save structs are expected sizes")
 #undef T_OBJECT_EVENT_TEMPLATE_TRAINER_TYPE_OFFSET
 #undef T_OBJECT_EVENT_TEMPLATE_SCRIPT_OFFSET
 #undef T_OBJECT_EVENT_TEMPLATE_FLAG_ID_OFFSET
+
+
+/* Phase 2 integration: exercise actual flash save/load and the BX19 tail. */
+TEST("Custom Ability BX19 survives a real flash save and reload")
+{
+    u16 ability = ABILITY_NONE;
+    gTestRunnerState.timeoutSeconds = 120;
+    ResetPokemonStorageTestFlash();
+    ResetPokemonStorageSystem();
+    EXPECT(CustomAbilityStorageSet(0x11223344, 0x55667788, ABILITY_WONDER_GUARD));
+    EXPECT_EQ(TrySavingData(SAVE_NORMAL), SAVE_STATUS_OK);
+    Save_ResetSaveCounters();
+    EXPECT(!CustomAbilityStorageGet(0x11223344, 0x55667788, &ability));
+    EXPECT_EQ(LoadGameSave(SAVE_NORMAL), SAVE_STATUS_OK);
+    EXPECT(CustomAbilityStorageGet(0x11223344, 0x55667788, &ability));
+    EXPECT_EQ(ability, ABILITY_WONDER_GUARD);
+}
+
+TEST("Custom Ability BX19 accepts an empty legacy tail")
+{
+    u16 ability = ABILITY_NONE;
+    gTestRunnerState.timeoutSeconds = 120;
+    ResetPokemonStorageTestFlash();
+    ResetPokemonStorageSystem();
+    EXPECT_EQ(TrySavingData(SAVE_NORMAL), SAVE_STATUS_OK);
+    EXPECT_EQ(LoadGameSave(SAVE_NORMAL), SAVE_STATUS_OK);
+    EXPECT(!CustomAbilityStorageGet(0x11223344, 0x55667788, &ability));
+}
+
+TEST("Custom Ability BX19 refuses a corrupt override tail")
+{
+    struct SaveSector *sector;
+    u16 ability = ABILITY_NONE;
+    gTestRunnerState.timeoutSeconds = 120;
+    ResetPokemonStorageTestFlash();
+    ResetPokemonStorageSystem();
+    EXPECT(CustomAbilityStorageSet(0x11223344, 0x55667788, ABILITY_WONDER_GUARD));
+    EXPECT_EQ(TrySavingData(SAVE_NORMAL), SAVE_STATUS_OK);
+    sector = Alloc(sizeof(*sector));
+    ReadNewestAuxiliarySector(sector);
+    // The final 76 bytes of the sector data hold the versioned override tail.
+    sector->data[SECTOR_DATA_SIZE - 76] ^= 1;
+    sector->checksum = CalculateTestSaveChecksum(sector->data, SECTOR_DATA_SIZE);
+    EXPECT_EQ(ProgramFlashSectorAndVerify(GetNewestAuxiliarySectorId(), (u8 *)sector), 0);
+    Save_ResetSaveCounters();
+    EXPECT_EQ(LoadGameSave(SAVE_NORMAL), SAVE_STATUS_ERROR);
+    EXPECT(!CustomAbilityStorageGet(0x11223344, 0x55667788, &ability));
+    Free(sector);
+}
+
+TEST("Custom Ability BX19 identity keys cannot distinguish clones")
+{
+    u16 ability = ABILITY_NONE;
+    Save_ResetSaveCounters();
+    EXPECT(CustomAbilityStorageSet(0x12345678, 0x9ABCDEF0, ABILITY_WONDER_GUARD));
+    // Identical PID + OT ID is the same key, even for a distinct Pokémon.
+    EXPECT(CustomAbilityStorageGet(0x12345678, 0x9ABCDEF0, &ability));
+    EXPECT_EQ(ability, ABILITY_WONDER_GUARD);
+    EXPECT(CustomAbilityStorageSet(0x12345678, 0x9ABCDEF0, ABILITY_MAGIC_GUARD));
+    EXPECT(CustomAbilityStorageGet(0x12345678, 0x9ABCDEF0, &ability));
+    EXPECT_EQ(ability, ABILITY_MAGIC_GUARD);
+}
