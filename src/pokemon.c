@@ -3161,12 +3161,34 @@ static bool8 IsPlayerPartyMon(const struct Pokemon *mon)
     return FALSE;
 }
 
+// Fail closed when two occupied player-party slots share the persisted key.
+// This avoids applying or changing one override on behalf of two Pokemon.
+static bool8 HasDuplicateCustomAbilityIdentity(const struct Pokemon *mon)
+{
+    u32 i;
+    u32 personality = GetMonData((struct Pokemon *)mon, MON_DATA_PERSONALITY);
+    u32 otId = GetMonData((struct Pokemon *)mon, MON_DATA_OT_ID);
+
+    for (i = 0; i < PARTY_SIZE; i++)
+    {
+        struct Pokemon *other = &gPlayerParty[i];
+        if (other == mon || GetMonData(other, MON_DATA_SPECIES) == SPECIES_NONE
+         || GetMonData(other, MON_DATA_IS_EGG))
+            continue;
+        if (GetMonData(other, MON_DATA_PERSONALITY) == personality
+         && GetMonData(other, MON_DATA_OT_ID) == otId)
+            return TRUE;
+    }
+    return FALSE;
+}
+
 bool8 TryGetCustomPrimaryAbility(struct Pokemon *mon, enum Ability *ability)
 {
     u16 stored;
     if (ability == NULL || !IsPlayerPartyMon(mon)
      || GetMonData(mon, MON_DATA_SPECIES) == SPECIES_NONE
-     || GetMonData(mon, MON_DATA_IS_EGG))
+     || GetMonData(mon, MON_DATA_IS_EGG)
+     || HasDuplicateCustomAbilityIdentity(mon))
         return FALSE;
     if (!CustomAbilityStorageGet(GetMonData(mon, MON_DATA_PERSONALITY),
                                  GetMonData(mon, MON_DATA_OT_ID), &stored))
@@ -3179,7 +3201,8 @@ bool8 SetCustomPrimaryAbility(struct Pokemon *mon, enum Ability ability)
 {
     if (!IsPlayerPartyMon(mon)
      || GetMonData(mon, MON_DATA_SPECIES) == SPECIES_NONE
-     || GetMonData(mon, MON_DATA_IS_EGG))
+     || GetMonData(mon, MON_DATA_IS_EGG)
+     || HasDuplicateCustomAbilityIdentity(mon))
         return FALSE;
     return CustomAbilityStorageSet(GetMonData(mon, MON_DATA_PERSONALITY),
                                    GetMonData(mon, MON_DATA_OT_ID), ability);
@@ -3188,7 +3211,8 @@ bool8 SetCustomPrimaryAbility(struct Pokemon *mon, enum Ability ability)
 bool8 ClearCustomPrimaryAbility(struct Pokemon *mon)
 {
     if (!IsPlayerPartyMon(mon)
-     || GetMonData(mon, MON_DATA_SPECIES) == SPECIES_NONE)
+     || GetMonData(mon, MON_DATA_SPECIES) == SPECIES_NONE
+     || HasDuplicateCustomAbilityIdentity(mon))
         return FALSE;
     return CustomAbilityStorageClear(GetMonData(mon, MON_DATA_PERSONALITY),
                                      GetMonData(mon, MON_DATA_OT_ID));
