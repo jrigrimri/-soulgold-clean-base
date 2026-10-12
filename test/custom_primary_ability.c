@@ -58,6 +58,8 @@ TEST("Custom Primary Ability rejects eggs and empty party slots")
 {
     bool8 egg = TRUE;
     SetupCustomAbilityTest();
+    // Other tests may leave a Pokemon in party slot 1; clear it explicitly.
+    memset(&gPlayerParty[1], 0, sizeof(gPlayerParty[1]));
     EXPECT(!SetCustomPrimaryAbility(&gPlayerParty[1], ABILITY_WONDER_GUARD));
     SetMonData(&gPlayerParty[0], MON_DATA_IS_EGG, &egg);
     EXPECT(!SetCustomPrimaryAbility(&gPlayerParty[0], ABILITY_WONDER_GUARD));
