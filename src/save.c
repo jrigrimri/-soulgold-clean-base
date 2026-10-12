@@ -188,6 +188,86 @@ static bool8 IsCustomAbilityTailValid(const struct CustomAbilityTail *tail)
 }
 
 
+/* Phase 2: bounded, versioned storage API. Full-box capacity is a later backend. */
+bool8 CustomAbilityStorageGet(u32 personality, u32 otId, u16 *ability)
+{
+    u16 i;
+    if (ability == NULL || !IsCustomAbilityTailValid(&sCustomAbilityTail))
+        return FALSE;
+    for (i = 0; i < sCustomAbilityTail.count; i++)
+    {
+        const struct CustomAbilityEntry *entry = &sCustomAbilityTail.entries[i];
+        if (entry->personality == personality && entry->otId == otId)
+        {
+            if (entry->ability == ABILITY_NONE || entry->ability >= ABILITIES_COUNT)
+                return FALSE;
+            *ability = entry->ability;
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
+bool8 CustomAbilityStorageSet(u32 personality, u32 otId, u16 ability)
+{
+    u16 i;
+    struct CustomAbilityEntry *entry;
+    if (ability == ABILITY_NONE || ability >= ABILITIES_COUNT
+     || !IsCustomAbilityTailValid(&sCustomAbilityTail))
+        return FALSE;
+    if (sCustomAbilityTail.magic == 0)
+    {
+        memset(&sCustomAbilityTail, 0, sizeof(sCustomAbilityTail));
+        sCustomAbilityTail.magic = CUSTOM_ABILITY_MAGIC;
+        sCustomAbilityTail.version = CUSTOM_ABILITY_VERSION;
+    }
+    for (i = 0; i < sCustomAbilityTail.count; i++)
+    {
+        entry = &sCustomAbilityTail.entries[i];
+        if (entry->personality == personality && entry->otId == otId)
+        {
+            entry->ability = ability;
+            sCustomAbilityTail.checksum = CalculateChecksum(&sCustomAbilityTail,
+                offsetof(struct CustomAbilityTail, checksum));
+            return TRUE;
+        }
+    }
+    if (sCustomAbilityTail.count >= CUSTOM_ABILITY_ENTRY_COUNT)
+        return FALSE;
+    entry = &sCustomAbilityTail.entries[sCustomAbilityTail.count++];
+    entry->personality = personality;
+    entry->otId = otId;
+    entry->ability = ability;
+    entry->reserved = 0;
+    sCustomAbilityTail.checksum = CalculateChecksum(&sCustomAbilityTail,
+        offsetof(struct CustomAbilityTail, checksum));
+    return TRUE;
+}
+
+bool8 CustomAbilityStorageClear(u32 personality, u32 otId)
+{
+    u16 i;
+    if (!IsCustomAbilityTailValid(&sCustomAbilityTail))
+        return FALSE;
+    for (i = 0; i < sCustomAbilityTail.count; i++)
+    {
+        if (sCustomAbilityTail.entries[i].personality == personality
+         && sCustomAbilityTail.entries[i].otId == otId)
+        {
+            for (; i + 1 < sCustomAbilityTail.count; i++)
+                sCustomAbilityTail.entries[i] = sCustomAbilityTail.entries[i + 1];
+            sCustomAbilityTail.count--;
+            memset(&sCustomAbilityTail.entries[sCustomAbilityTail.count], 0,
+                   sizeof(sCustomAbilityTail.entries[0]));
+            sCustomAbilityTail.checksum = CalculateChecksum(&sCustomAbilityTail,
+                offsetof(struct CustomAbilityTail, checksum));
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
+
 struct Bx19AuxiliaryRecord
 {
     u32 magic;
@@ -279,6 +359,7 @@ void ClearSaveData(void)
 
 void Save_ResetSaveCounters(void)
 {
+    memset(&sCustomAbilityTail, 0, sizeof(sCustomAbilityTail));
     gSaveCounter = 0;
     gLastWrittenSector = 0;
     gDamagedSaveSectors = 0;
