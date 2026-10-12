@@ -1,6 +1,7 @@
 #include "global.h"
 #include "pokemon.h"
 #include "save.h"
+#include "new_game.h"
 #include "test/test.h"
 #include "constants/abilities.h"
 #include "constants/species.h"
@@ -135,4 +136,31 @@ TEST("Custom Primary Ability storage capacity recovers after clearing")
     EXPECT(!CustomAbilityStorageGet(2, 4321, &ability));
     EXPECT(CustomAbilityStorageGet(5, 4321, &ability));
     EXPECT_EQ(ability, ABILITY_MAGIC_GUARD);
+}
+
+TEST("Custom Primary Ability actual new game initialization clears old overrides")
+{
+    u16 stored = ABILITY_NONE;
+    SetupCustomAbilityTest();
+    EXPECT(CustomAbilityStorageSet(0x11223344, 0x55667788, ABILITY_WONDER_GUARD));
+    NewGameInitData();
+    EXPECT(!CustomAbilityStorageGet(0x11223344, 0x55667788, &stored));
+}
+
+TEST("Custom Primary Ability duplicate identity shares the same override")
+{
+    enum Ability ability = ABILITY_NONE;
+    u32 personality;
+    u32 otId;
+    SetupCustomAbilityTest();
+    CreateMon(&gPlayerParty[1], SPECIES_UMBREON, 30, 0, OTID_STRUCT_PLAYER_ID);
+    personality = GetMonData(&gPlayerParty[0], MON_DATA_PERSONALITY);
+    otId = GetMonData(&gPlayerParty[0], MON_DATA_OT_ID);
+    SetMonData(&gPlayerParty[1], MON_DATA_PERSONALITY, &personality);
+    SetMonData(&gPlayerParty[1], MON_DATA_OT_ID, &otId);
+    EXPECT(SetCustomPrimaryAbility(&gPlayerParty[0], ABILITY_WONDER_GUARD));
+    EXPECT(TryGetCustomPrimaryAbility(&gPlayerParty[1], &ability));
+    EXPECT_EQ(ability, ABILITY_WONDER_GUARD);
+    EXPECT(ClearCustomPrimaryAbility(&gPlayerParty[1]));
+    EXPECT(!TryGetCustomPrimaryAbility(&gPlayerParty[0], &ability));
 }
