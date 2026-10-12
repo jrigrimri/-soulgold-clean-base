@@ -107,6 +107,7 @@ bool8 CustomAbilityStorageGet(u32 personality, u32 otId, u16 *ability);
 bool8 CustomAbilityStorageSet(u32 personality, u32 otId, u16 ability);
 bool8 CustomAbilityStorageClear(u32 personality, u32 otId);
 void ClearSaveData(void);
+void CustomAbilityStorageReset(void);
 void Save_ResetSaveCounters(void);
 u8 HandleSavingData(u8 saveType);
 u8 TrySavingData(u8 saveType);
