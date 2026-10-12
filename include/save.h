@@ -102,6 +102,10 @@ extern struct SaveSectorLocation gRamSaveSectorLocations[];
 
 extern struct SaveSector gSaveDataBuffer;
 
+// BX19 Test V1 backend: four entries; never silently evicts an entry.
+bool8 CustomAbilityStorageGet(u32 personality, u32 otId, u16 *ability);
+bool8 CustomAbilityStorageSet(u32 personality, u32 otId, u16 ability);
+bool8 CustomAbilityStorageClear(u32 personality, u32 otId);
 void ClearSaveData(void);
 void Save_ResetSaveCounters(void);
 u8 HandleSavingData(u8 saveType);
