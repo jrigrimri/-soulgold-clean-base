@@ -2402,7 +2402,9 @@ TEST("Custom Ability BX19 refuses a corrupt override tail")
     sector->checksum = CalculateTestSaveChecksum(sector->data, SECTOR_DATA_SIZE);
     EXPECT_EQ(ProgramFlashSectorAndVerify(GetNewestAuxiliarySectorId(), (u8 *)sector), 0);
     Save_ResetSaveCounters();
-    EXPECT_EQ(LoadGameSave(SAVE_NORMAL), SAVE_STATUS_ERROR);
+    // A damaged BX19 tail invalidates this slot. With the other slot empty,
+    // the save loader reports CORRUPT rather than the generic ERROR status.
+    EXPECT_EQ(LoadGameSave(SAVE_NORMAL), SAVE_STATUS_CORRUPT);
     EXPECT(!CustomAbilityStorageGet(0x11223344, 0x55667788, &ability));
     Free(sector);
 }
