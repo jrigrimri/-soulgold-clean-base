@@ -147,7 +147,7 @@ TEST("Custom Primary Ability actual new game initialization clears old overrides
     EXPECT(!CustomAbilityStorageGet(0x11223344, 0x55667788, &stored));
 }
 
-TEST("Custom Primary Ability duplicate identity shares the same override")
+TEST("Custom Primary Ability duplicate identity fails closed without changing save")
 {
     enum Ability ability = ABILITY_NONE;
     u32 personality;
@@ -158,9 +158,19 @@ TEST("Custom Primary Ability duplicate identity shares the same override")
     otId = GetMonData(&gPlayerParty[0], MON_DATA_OT_ID);
     SetMonData(&gPlayerParty[1], MON_DATA_PERSONALITY, &personality);
     SetMonData(&gPlayerParty[1], MON_DATA_OT_ID, &otId);
-    EXPECT(SetCustomPrimaryAbility(&gPlayerParty[0], ABILITY_WONDER_GUARD));
-    EXPECT(TryGetCustomPrimaryAbility(&gPlayerParty[1], &ability));
-    EXPECT_EQ(ability, ABILITY_WONDER_GUARD);
-    EXPECT(ClearCustomPrimaryAbility(&gPlayerParty[1]));
+    // A legacy record can already exist before a clone enters the party.
+    EXPECT(CustomAbilityStorageSet(personality, otId, ABILITY_WONDER_GUARD));
     EXPECT(!TryGetCustomPrimaryAbility(&gPlayerParty[0], &ability));
+    EXPECT(!TryGetCustomPrimaryAbility(&gPlayerParty[1], &ability));
+    EXPECT_EQ(GetEffectivePrimaryAbility(&gPlayerParty[0]), GetMonAbility(&gPlayerParty[0]));
+    EXPECT_EQ(GetEffectivePrimaryAbility(&gPlayerParty[1]), GetMonAbility(&gPlayerParty[1]));
+    EXPECT(!SetCustomPrimaryAbility(&gPlayerParty[0], ABILITY_MAGIC_GUARD));
+    EXPECT(!SetCustomPrimaryAbility(&gPlayerParty[1], ABILITY_MAGIC_GUARD));
+    EXPECT(!ClearCustomPrimaryAbility(&gPlayerParty[1]));
+    EXPECT(CustomAbilityStorageGet(personality, otId, (u16 *)&ability));
+    EXPECT_EQ(ability, ABILITY_WONDER_GUARD);
+    // Once the duplicate leaves the party, the existing legacy record is usable.
+    memset(&gPlayerParty[1], 0, sizeof(gPlayerParty[1]));
+    EXPECT(TryGetCustomPrimaryAbility(&gPlayerParty[0], &ability));
+    EXPECT_EQ(ability, ABILITY_WONDER_GUARD);
 }
