@@ -45,6 +45,7 @@
 #include "pokemon_storage_system.h"
 #include "pokerus.h"
 #include "random.h"
+#include "save.h"
 #include "recorded_battle.h"
 #include "replay_options.h"
 #include "regions.h"
