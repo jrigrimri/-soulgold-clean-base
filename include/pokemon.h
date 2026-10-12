@@ -750,6 +750,11 @@ u8 GetMonsStateToDoubles(void);
 u8 GetMonsStateToDoubles_2(void);
 enum Ability GetAbilityBySpecies(u16 species, u8 abilityNum);
 enum Ability GetMonAbility(struct Pokemon *mon);
+// Phase 2: explicitly player-party-only until box identity is safely supported.
+enum Ability GetEffectivePrimaryAbility(struct Pokemon *mon);
+bool8 TryGetCustomPrimaryAbility(struct Pokemon *mon, enum Ability *ability);
+bool8 SetCustomPrimaryAbility(struct Pokemon *mon, enum Ability ability);
+bool8 ClearCustomPrimaryAbility(struct Pokemon *mon);
 void CreateSecretBaseEnemyParty(struct SecretBase *secretBaseRecord);
 enum TrainerPicID GetSecretBaseTrainerPicIndex(void);
 enum TrainerClassID GetSecretBaseTrainerClass(void);
