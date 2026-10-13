@@ -316,8 +316,7 @@ void NewGameInitData(void)
         {
             // Distinct PIDs with matching natural natures; 100000 is divisible by 25.
             pid = 100000 + i * 100 + sTestNatures[i];
-            CreateMon(&gPlayerParty[i], sTestSpecies[i], 10, 31, OTID_STRUCT_PLAYER_ID);
-            SetMonData(&gPlayerParty[i], MON_DATA_PERSONALITY, &pid);
+            CreateMonWithIVs(&gPlayerParty[i], sTestSpecies[i], 10, pid, OTID_STRUCT_PLAYER_ID, 31);
             nature = sTestNatures[i];
             SetMonData(&gPlayerParty[i], MON_DATA_HIDDEN_NATURE, &nature);
             for (stat = 0; stat < NUM_STATS; stat++)
