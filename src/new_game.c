@@ -293,6 +293,14 @@ void NewGameInitData(void)
     GiveMonInitialMoveset(&gPlayerParty[0]);
     CreateMon(&gPlayerParty[1], SPECIES_UMBREON, 20, 0, OTID_STRUCT_PLAYER_ID);
     GiveMonInitialMoveset(&gPlayerParty[1]);
+    // The temporary test pair must have distinct persisted identities.
+    // Early New Game RNG can produce matching PID/OT keys, which fail closed.
+    if (GetMonData(&gPlayerParty[0], MON_DATA_PERSONALITY) == GetMonData(&gPlayerParty[1], MON_DATA_PERSONALITY)
+     && GetMonData(&gPlayerParty[0], MON_DATA_OT_ID) == GetMonData(&gPlayerParty[1], MON_DATA_OT_ID))
+    {
+        u32 distinctPid = GetMonData(&gPlayerParty[0], MON_DATA_PERSONALITY) ^ 0x01000001;
+        SetMonData(&gPlayerParty[1], MON_DATA_PERSONALITY, &distinctPid);
+    }
     gPlayerPartyCount = 2;
     SetCustomPrimaryAbility(&gPlayerParty[0], ABILITY_WONDER_GUARD);
     SetCustomPrimaryAbility(&gPlayerParty[1], ABILITY_INTIMIDATE);
