@@ -3884,16 +3884,20 @@ static void PrintMonOTID(void)
 static enum Ability GetDisplayedPrimaryAbility(void)
 {
     struct Pokemon *mon;
+    u32 i;
     enum Ability normalAbility = GetAbilityBySpecies(sMonSummaryScreen->summary.species, sMonSummaryScreen->summary.abilityNum);
 
     if (sMonSummaryScreen->isBoxMon || sMonSummaryScreen->mode == SUMMARY_MODE_BATTLE_OPPONENT_TRAITS)
         return normalAbility;
 
     mon = &sMonSummaryScreen->monList.mons[sMonSummaryScreen->curMonIndex];
-    if (mon < &gPlayerParty[0] || mon >= &gPlayerParty[PARTY_SIZE])
-        return normalAbility;
+    for (i = 0; i < PARTY_SIZE; i++)
+    {
+        if (mon == &gPlayerParty[i])
+            return GetEffectivePrimaryAbility(mon);
+    }
 
-    return GetEffectivePrimaryAbility(mon);
+    return normalAbility;
 }
 
 static void PrintMonAbilityName(void)
