@@ -287,23 +287,50 @@ void NewGameInitData(void)
     // New Game must not inherit overrides from a previously loaded save.
     // Keep save counters intact; only clear the custom ability table.
     CustomAbilityStorageReset();
-    // Temporary Phase 4 emulator test party; remove after validation.
-    // A: Combusken with Wonder Guard; B: Umbreon with Intimidate.
-    CreateMon(&gPlayerParty[0], SPECIES_COMBUSKEN, 20, 0, OTID_STRUCT_PLAYER_ID);
-    GiveMonInitialMoveset(&gPlayerParty[0]);
-    CreateMon(&gPlayerParty[1], SPECIES_UMBREON, 20, 0, OTID_STRUCT_PLAYER_ID);
-    GiveMonInitialMoveset(&gPlayerParty[1]);
-    // The temporary test pair must have distinct persisted identities.
-    // Early New Game RNG can produce matching PID/OT keys, which fail closed.
-    if (GetMonData(&gPlayerParty[0], MON_DATA_PERSONALITY) == GetMonData(&gPlayerParty[1], MON_DATA_PERSONALITY)
-     && GetMonData(&gPlayerParty[0], MON_DATA_OT_ID) == GetMonData(&gPlayerParty[1], MON_DATA_OT_ID))
+    // Temporary Phase 5 emulator test party: five independent identities.
+    // EV 255 in all six stats is deliberately outside the standard total cap.
     {
-        u32 distinctPid = GetMonData(&gPlayerParty[0], MON_DATA_PERSONALITY) ^ 0x01000001;
-        SetMonData(&gPlayerParty[1], MON_DATA_PERSONALITY, &distinctPid);
+        static const u16 sTestSpecies[] = {
+            SPECIES_UMBREON, SPECIES_MILOTIC, SPECIES_LATIOS,
+            SPECIES_MACHAMP, SPECIES_GHOLDENGO
+        };
+        static const u16 sTestItems[] = {
+            ITEM_LEFTOVERS, ITEM_ROCKY_HELMET, ITEM_SOUL_DEW,
+            ITEM_LIFE_ORB, ITEM_LIFE_ORB
+        };
+        static const u16 sTestAbilities[] = {
+            ABILITY_WONDER_GUARD, ABILITY_IRON_BARBS, ABILITY_SPEED_BOOST,
+            ABILITY_HUGE_POWER, ABILITY_CONTRARY
+        };
+        static const u8 sTestNatures[] = {
+            NATURE_CALM, NATURE_BOLD, NATURE_MODEST,
+            NATURE_ADAMANT, NATURE_MODEST
+        };
+        u32 i, stat;
+        u32 ev = 255;
+        u32 nature;
+        u32 pid;
+        u16 item;
+
+        for (i = 0; i < ARRAY_COUNT(sTestSpecies); i++)
+        {
+            // Distinct PIDs with matching natural natures; 100000 is divisible by 25.
+            pid = 100000 + i * 100 + sTestNatures[i];
+            CreateMon(&gPlayerParty[i], sTestSpecies[i], 10, 31, OTID_STRUCT_PLAYER_ID);
+            SetMonData(&gPlayerParty[i], MON_DATA_PERSONALITY, &pid);
+            nature = sTestNatures[i];
+            SetMonData(&gPlayerParty[i], MON_DATA_HIDDEN_NATURE, &nature);
+            for (stat = 0; stat < NUM_STATS; stat++)
+                SetMonData(&gPlayerParty[i], MON_DATA_HP_EV + stat, &ev);
+            item = sTestItems[i];
+            SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &item);
+            GiveMonInitialMoveset(&gPlayerParty[i]);
+            CalculateMonStats(&gPlayerParty[i]);
+        }
+        gPlayerPartyCount = ARRAY_COUNT(sTestSpecies);
+        for (i = 0; i < ARRAY_COUNT(sTestSpecies); i++)
+            SetCustomPrimaryAbility(&gPlayerParty[i], sTestAbilities[i]);
     }
-    gPlayerPartyCount = 2;
-    SetCustomPrimaryAbility(&gPlayerParty[0], ABILITY_WONDER_GUARD);
-    SetCustomPrimaryAbility(&gPlayerParty[1], ABILITY_INTIMIDATE);
     ResetHallOfFameArchive();
     DeactivateAllRoamers();
     gSaveBlock1Ptr->registeredItemCompat = ITEM_NONE;
