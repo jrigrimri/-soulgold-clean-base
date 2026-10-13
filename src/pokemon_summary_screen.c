@@ -3879,15 +3879,32 @@ static void PrintMonOTID(void)
     }
 }
 
+// Only resolve overrides for the actual player-party object, never summary copies,
+// boxed Pokemon, opponents, or other temporary Pokemon lists.
+static enum Ability GetDisplayedPrimaryAbility(void)
+{
+    struct Pokemon *mon;
+    enum Ability normalAbility = GetAbilityBySpecies(sMonSummaryScreen->summary.species, sMonSummaryScreen->summary.abilityNum);
+
+    if (sMonSummaryScreen->isBoxMon || sMonSummaryScreen->mode == SUMMARY_MODE_BATTLE_OPPONENT_TRAITS)
+        return normalAbility;
+
+    mon = &sMonSummaryScreen->monList.mons[sMonSummaryScreen->curMonIndex];
+    if (mon < &gPlayerParty[0] || mon >= &gPlayerParty[PARTY_SIZE])
+        return normalAbility;
+
+    return GetEffectivePrimaryAbility(mon);
+}
+
 static void PrintMonAbilityName(void)
 {
-    enum Ability ability = GetAbilityBySpecies(sMonSummaryScreen->summary.species, sMonSummaryScreen->summary.abilityNum);
+    enum Ability ability = GetDisplayedPrimaryAbility();
     PrintTextOnWindow(AddWindowFromTemplateList(sPageInfoTemplate, PSS_DATA_WINDOW_INFO_ABILITY), gAbilitiesInfo[ability].name, 0, 1, 0, 1);
 }
 
 static void PrintMonAbilityDescription(void)
 {
-    enum Ability ability = GetAbilityBySpecies(sMonSummaryScreen->summary.species, sMonSummaryScreen->summary.abilityNum);
+    enum Ability ability = GetDisplayedPrimaryAbility();
     PrintTextOnWindow(AddWindowFromTemplateList(sPageInfoTemplate, PSS_DATA_WINDOW_INFO_ABILITY), gAbilitiesInfo[ability].description, 0, 17, 0, 0);
 }
 
@@ -4119,7 +4136,7 @@ static void PrintEggMemo(void)
         u8 windowId;
 
         if (innateIndex == 0)
-            trait = GetAbilityBySpecies(sMonSummaryScreen->summary.species, sMonSummaryScreen->summary.abilityNum);
+            trait = GetDisplayedPrimaryAbility();
         else if (innateIndex <= MAX_MON_INNATES)
             trait = sum->innates[innateIndex - 1];
             
@@ -4154,7 +4171,7 @@ static void PrintEggMemo(void)
         struct PokeSummary *sum = &sMonSummaryScreen->summary;
 
         if (traitIndex == 0)
-            return GetAbilityBySpecies(sum->species, sum->abilityNum);
+            return GetDisplayedPrimaryAbility();
         else if (traitIndex <= MAX_MON_INNATES)
             return sum->innates[traitIndex - 1];
         else
