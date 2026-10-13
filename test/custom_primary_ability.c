@@ -174,3 +174,41 @@ TEST("Custom Primary Ability duplicate identity fails closed without changing sa
     EXPECT(TryGetCustomPrimaryAbility(&gPlayerParty[0], &ability));
     EXPECT_EQ(ability, ABILITY_WONDER_GUARD);
 }
+
+TEST("Custom Primary Ability Phase 4 keeps Wonder Guard and Intimidate independent")
+{
+    enum Ability ability = ABILITY_NONE;
+    u32 personalityA, personalityB;
+    SetupCustomAbilityTest();
+    CreateMon(&gPlayerParty[1], SPECIES_COMBUSKEN, 20, 0, OTID_STRUCT_PLAYER_ID);
+    personalityA = GetMonData(&gPlayerParty[0], MON_DATA_PERSONALITY);
+    personalityB = personalityA ^ 0x01000001;
+    SetMonData(&gPlayerParty[1], MON_DATA_PERSONALITY, &personalityB);
+
+    EXPECT(SetCustomPrimaryAbility(&gPlayerParty[0], ABILITY_WONDER_GUARD));
+    EXPECT(SetCustomPrimaryAbility(&gPlayerParty[1], ABILITY_INTIMIDATE));
+    EXPECT_EQ(GetEffectivePrimaryAbility(&gPlayerParty[0]), ABILITY_WONDER_GUARD);
+    EXPECT_EQ(GetEffectivePrimaryAbility(&gPlayerParty[1]), ABILITY_INTIMIDATE);
+
+    EXPECT(SetCustomPrimaryAbility(&gPlayerParty[0], ABILITY_MAGIC_GUARD));
+    EXPECT_EQ(GetEffectivePrimaryAbility(&gPlayerParty[0]), ABILITY_MAGIC_GUARD);
+    EXPECT_EQ(GetEffectivePrimaryAbility(&gPlayerParty[1]), ABILITY_INTIMIDATE);
+    EXPECT(ClearCustomPrimaryAbility(&gPlayerParty[0]));
+    EXPECT_EQ(GetEffectivePrimaryAbility(&gPlayerParty[0]), GetMonAbility(&gPlayerParty[0]));
+    EXPECT(TryGetCustomPrimaryAbility(&gPlayerParty[1], &ability));
+    EXPECT_EQ(ability, ABILITY_INTIMIDATE);
+}
+
+TEST("Custom Primary Ability Phase 4 refuses enemy identity even when player has Intimidate")
+{
+    u32 pid, otId;
+    SetupCustomAbilityTest();
+    pid = GetMonData(&gPlayerParty[0], MON_DATA_PERSONALITY);
+    otId = GetMonData(&gPlayerParty[0], MON_DATA_OT_ID);
+    EXPECT(SetCustomPrimaryAbility(&gPlayerParty[0], ABILITY_INTIMIDATE));
+    CreateMon(&gEnemyParty[0], SPECIES_UMBREON, 30, 0, OTID_STRUCT_PLAYER_ID);
+    SetMonData(&gEnemyParty[0], MON_DATA_PERSONALITY, &pid);
+    SetMonData(&gEnemyParty[0], MON_DATA_OT_ID, &otId);
+    EXPECT_EQ(GetEffectivePrimaryAbility(&gEnemyParty[0]), GetMonAbility(&gEnemyParty[0]));
+    EXPECT_EQ(GetEffectivePrimaryAbility(&gPlayerParty[0]), ABILITY_INTIMIDATE);
+}
