@@ -11,6 +11,10 @@
 static void SetupCustomAbilityTest(void)
 {
     Save_ResetSaveCounters();
+    // Full-suite tests can leave occupied party slots behind. Reset all slots
+    // so duplicate-identity checks are isolated from unrelated battle tests.
+    memset(gPlayerParty, 0, sizeof(gPlayerParty));
+    memset(gEnemyParty, 0, sizeof(gEnemyParty));
     CreateMon(&gPlayerParty[0], SPECIES_UMBREON, 30, 0, OTID_STRUCT_PLAYER_ID);
 }
 
