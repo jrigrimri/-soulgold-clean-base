@@ -152,8 +152,8 @@ STATIC_ASSERT(sizeof(struct SaveBlock1) == 0x3C54, SaveBlock1LegacySize);
 #define BX19_SCHEMA_VERSION 1
 // Test V1: versioned tail stored outside the BX19 payload, inside its sector checksum.
 #define CUSTOM_ABILITY_MAGIC 0x31424143
-#define CUSTOM_ABILITY_VERSION 1
-#define CUSTOM_ABILITY_ENTRY_COUNT 4
+#define CUSTOM_ABILITY_VERSION 2
+#define CUSTOM_ABILITY_ENTRY_COUNT 5
 
 struct CustomAbilityEntry
 {
@@ -163,6 +163,17 @@ struct CustomAbilityEntry
     u16 reserved;
 };
 
+// Version 1 used four entries and 18 trailing reserved bytes.
+struct CustomAbilityTailV1
+{
+    u32 magic;
+    u16 version;
+    u16 count;
+    struct CustomAbilityEntry entries[4];
+    u16 checksum;
+    u8 reserved[18];
+};
+
 struct CustomAbilityTail
 {
     u32 magic;
@@ -170,25 +181,54 @@ struct CustomAbilityTail
     u16 count;
     struct CustomAbilityEntry entries[CUSTOM_ABILITY_ENTRY_COUNT];
     u16 checksum;
-    u8 reserved[18];
+    u8 reserved[6];
 };
 
 STATIC_ASSERT(sizeof(struct CustomAbilityTail) == 76, CustomAbilityTailSize);
+STATIC_ASSERT(sizeof(struct CustomAbilityTailV1) == 76, CustomAbilityTailV1Size);
 static struct CustomAbilityTail sCustomAbilityTail;
 
 static bool8 IsCustomAbilityTailValid(const struct CustomAbilityTail *tail)
 {
+    u16 i;
     if (IsZeroed((const u8 *)tail, sizeof(*tail)))
         return TRUE;
-    return tail->magic == CUSTOM_ABILITY_MAGIC
-        && tail->version == CUSTOM_ABILITY_VERSION
-        && tail->count <= CUSTOM_ABILITY_ENTRY_COUNT
-        && (tail->count == 0 || (tail->entries[0].ability != ABILITY_NONE && tail->entries[0].ability < ABILITIES_COUNT))
-        && (tail->count <= 1 || (tail->entries[1].ability != ABILITY_NONE && tail->entries[1].ability < ABILITIES_COUNT))
-        && (tail->count <= 2 || (tail->entries[2].ability != ABILITY_NONE && tail->entries[2].ability < ABILITIES_COUNT))
-        && (tail->count <= 3 || (tail->entries[3].ability != ABILITY_NONE && tail->entries[3].ability < ABILITIES_COUNT))
-        && IsZeroed(tail->reserved, sizeof(tail->reserved))
-        && tail->checksum == CalculateChecksum((void *)tail, offsetof(struct CustomAbilityTail, checksum));
+    if (tail->magic != CUSTOM_ABILITY_MAGIC)
+        return FALSE;
+    if (tail->version == 1)
+    {
+        const struct CustomAbilityTailV1 *old = (const struct CustomAbilityTailV1 *)tail;
+        if (old->count > 4 || !IsZeroed(old->reserved, sizeof(old->reserved))
+         || old->checksum != CalculateChecksum((void *)old, offsetof(struct CustomAbilityTailV1, checksum)))
+            return FALSE;
+        for (i = 0; i < old->count; i++)
+            if (old->entries[i].ability == ABILITY_NONE || old->entries[i].ability >= ABILITIES_COUNT)
+                return FALSE;
+        return TRUE;
+    }
+    if (tail->version != CUSTOM_ABILITY_VERSION || tail->count > CUSTOM_ABILITY_ENTRY_COUNT
+     || !IsZeroed(tail->reserved, sizeof(tail->reserved))
+     || tail->checksum != CalculateChecksum((void *)tail, offsetof(struct CustomAbilityTail, checksum)))
+        return FALSE;
+    for (i = 0; i < tail->count; i++)
+        if (tail->entries[i].ability == ABILITY_NONE || tail->entries[i].ability >= ABILITIES_COUNT)
+            return FALSE;
+    return TRUE;
+}
+
+static void UpgradeCustomAbilityTail(void)
+{
+    struct CustomAbilityTailV1 old;
+    if (sCustomAbilityTail.version != 1 || !IsCustomAbilityTailValid(&sCustomAbilityTail))
+        return;
+    memcpy(&old, &sCustomAbilityTail, sizeof(old));
+    memset(&sCustomAbilityTail, 0, sizeof(sCustomAbilityTail));
+    sCustomAbilityTail.magic = CUSTOM_ABILITY_MAGIC;
+    sCustomAbilityTail.version = CUSTOM_ABILITY_VERSION;
+    sCustomAbilityTail.count = old.count;
+    memcpy(sCustomAbilityTail.entries, old.entries, old.count * sizeof(old.entries[0]));
+    sCustomAbilityTail.checksum = CalculateChecksum(&sCustomAbilityTail,
+        offsetof(struct CustomAbilityTail, checksum));
 }
 
 
@@ -198,6 +238,7 @@ bool8 CustomAbilityStorageGet(u32 personality, u32 otId, u16 *ability)
     u16 i;
     if (ability == NULL || !IsCustomAbilityTailValid(&sCustomAbilityTail))
         return FALSE;
+    UpgradeCustomAbilityTail();
     for (i = 0; i < sCustomAbilityTail.count; i++)
     {
         const struct CustomAbilityEntry *entry = &sCustomAbilityTail.entries[i];
@@ -219,6 +260,7 @@ bool8 CustomAbilityStorageSet(u32 personality, u32 otId, u16 ability)
     if (ability == ABILITY_NONE || ability >= ABILITIES_COUNT
      || !IsCustomAbilityTailValid(&sCustomAbilityTail))
         return FALSE;
+    UpgradeCustomAbilityTail();
     if (sCustomAbilityTail.magic == 0)
     {
         memset(&sCustomAbilityTail, 0, sizeof(sCustomAbilityTail));
@@ -253,6 +295,7 @@ bool8 CustomAbilityStorageClear(u32 personality, u32 otId)
     u16 i;
     if (!IsCustomAbilityTailValid(&sCustomAbilityTail))
         return FALSE;
+    UpgradeCustomAbilityTail();
     for (i = 0; i < sCustomAbilityTail.count; i++)
     {
         if (sCustomAbilityTail.entries[i].personality == personality
@@ -575,6 +618,7 @@ static u8 WriteBx19AuxiliarySector(void)
 
     if (!IsCustomAbilityTailValid(&sCustomAbilityTail))
         return SAVE_STATUS_ERROR;
+    UpgradeCustomAbilityTail();
     memcpy(&gReadWriteSector->data[sizeof(*record)], &sCustomAbilityTail, sizeof(sCustomAbilityTail));
     record->checksum = CalculateChecksum(&record->box19, record->payloadLength);
     record->checksumInverse = (u16)~record->checksum;
@@ -802,6 +846,7 @@ static void LoadPokemonStorageOverflow(void)
             record = (struct Bx19AuxiliaryRecord *)gReadWriteSector->data;
             memcpy(&gPokemonStoragePtr->box19, &record->box19, PKMN_STORAGE_BOX19_RECORD_SIZE);
             memcpy(&sCustomAbilityTail, &gReadWriteSector->data[sizeof(*record)], sizeof(sCustomAbilityTail));
+            UpgradeCustomAbilityTail();
         }
     }
 }
