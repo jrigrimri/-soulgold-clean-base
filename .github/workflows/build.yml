@@ -6,6 +6,7 @@ on:
       - master
       - upcoming
       - feature/custom-primary-ability-test-v1
+      - feature/custom-primary-ability-phase4-validation
   pull_request:
 
 env:
@@ -105,6 +106,11 @@ jobs:
         env:
           TEST: 1
         run: make -j$(nproc) check TESTS='Custom Ability BX19'
+
+      - name: Phase 4 multi-Pokemon ability tests
+        env:
+          TEST: 1
+        run: make -j$(nproc) check TESTS='Custom Primary Ability Phase 4'
 
       - name: Test
         env:
