@@ -7,6 +7,7 @@ on:
       - upcoming
       - feature/custom-primary-ability-test-v1
       - feature/custom-primary-ability-phase4-validation
+      - feature/custom-primary-ability-phase5-five-mon
   pull_request:
 
 env:
