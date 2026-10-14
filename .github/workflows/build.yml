@@ -5,6 +5,7 @@ on:
     branches:
       - master
       - upcoming
+      - feature/custom-abilitynum3
   pull_request:
 
 env:
