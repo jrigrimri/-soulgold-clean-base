@@ -91,10 +91,10 @@ TEST("Custom Primary Ability storage rejects overflow without evicting")
     u32 i;
     u16 stored = ABILITY_NONE;
     SetupCustomAbilityTest();
-    for (i = 1; i <= 4; i++)
+    for (i = 1; i <= 5; i++)
         EXPECT(CustomAbilityStorageSet(i, 12345, ABILITY_WONDER_GUARD));
-    EXPECT(!CustomAbilityStorageSet(5, 12345, ABILITY_MAGIC_GUARD));
-    for (i = 1; i <= 4; i++)
+    EXPECT(!CustomAbilityStorageSet(6, 12345, ABILITY_MAGIC_GUARD));
+    for (i = 1; i <= 5; i++)
     {
         EXPECT(CustomAbilityStorageGet(i, 12345, &stored));
         EXPECT_EQ(stored, ABILITY_WONDER_GUARD);
@@ -132,13 +132,13 @@ TEST("Custom Primary Ability storage capacity recovers after clearing")
     u32 i;
     u16 ability = ABILITY_NONE;
     SetupCustomAbilityTest();
-    for (i = 1; i <= 4; i++)
+    for (i = 1; i <= 5; i++)
         EXPECT(CustomAbilityStorageSet(i, 4321, ABILITY_WONDER_GUARD));
-    EXPECT(!CustomAbilityStorageSet(5, 4321, ABILITY_MAGIC_GUARD));
+    EXPECT(!CustomAbilityStorageSet(6, 4321, ABILITY_MAGIC_GUARD));
     EXPECT(CustomAbilityStorageClear(2, 4321));
-    EXPECT(CustomAbilityStorageSet(5, 4321, ABILITY_MAGIC_GUARD));
+    EXPECT(CustomAbilityStorageSet(6, 4321, ABILITY_MAGIC_GUARD));
     EXPECT(!CustomAbilityStorageGet(2, 4321, &ability));
-    EXPECT(CustomAbilityStorageGet(5, 4321, &ability));
+    EXPECT(CustomAbilityStorageGet(6, 4321, &ability));
     EXPECT_EQ(ability, ABILITY_MAGIC_GUARD);
 }
 
