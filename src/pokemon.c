@@ -3129,6 +3129,11 @@ enum Ability GetAbilityBySpecies(u16 species, u8 abilityNum)
 {
     int i;
 
+    // Experimental AbilityNum3: a fourth selector, not a fourth species ability slot.
+    // Keep slots 0-2 unchanged. The custom Ability ID is fixed for this prototype.
+    if (abilityNum == 3 && species == SPECIES_COMBUSKEN)
+        return ABILITY_WONDER_GUARD;
+
     if (abilityNum < NUM_ABILITY_SLOTS)
         gLastUsedAbility = GetSpeciesAbility(species, abilityNum);
     else
