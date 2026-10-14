@@ -2375,6 +2375,31 @@ TEST("Custom Ability BX19 survives a real flash save and reload")
     EXPECT_EQ(ability, ABILITY_WONDER_GUARD);
 }
 
+TEST("Custom Ability BX19 Phase 5 persists five independent overrides across flash reload")
+{
+    static const u16 abilities[5] = {
+        ABILITY_WONDER_GUARD, ABILITY_IRON_BARBS, ABILITY_SPEED_BOOST,
+        ABILITY_HUGE_POWER, ABILITY_CONTRARY
+    };
+    u16 ability = ABILITY_NONE;
+    u32 i;
+    gTestRunnerState.timeoutSeconds = 120;
+    ResetPokemonStorageTestFlash();
+    ResetPokemonStorageSystem();
+    for (i = 0; i < ARRAY_COUNT(abilities); i++)
+        EXPECT(CustomAbilityStorageSet(0xA1000000 + i, 0xB2000000 + i, abilities[i]));
+    EXPECT(!CustomAbilityStorageSet(0xA1000005, 0xB2000005, ABILITY_MAGIC_GUARD));
+    EXPECT_EQ(TrySavingData(SAVE_NORMAL), SAVE_STATUS_OK);
+    Save_ResetSaveCounters();
+    EXPECT_EQ(LoadGameSave(SAVE_NORMAL), SAVE_STATUS_OK);
+    for (i = 0; i < ARRAY_COUNT(abilities); i++)
+    {
+        EXPECT(CustomAbilityStorageGet(0xA1000000 + i, 0xB2000000 + i, &ability));
+        EXPECT_EQ(ability, abilities[i]);
+    }
+    EXPECT(!CustomAbilityStorageGet(0xA1000005, 0xB2000005, &ability));
+}
+
 TEST("Custom Ability BX19 accepts an empty legacy tail")
 {
     u16 ability = ABILITY_NONE;
@@ -2444,14 +2469,14 @@ TEST("Custom Ability BX19 rejects malformed tail fields")
         {
         case 0: tail[0] ^= 1; break; // Magic
         case 1: tail[4] ^= 1; break; // Version
-        case 2: tail[6] = 5; break; // Count exceeds four
-        case 3: tail[56] ^= 1; break; // Tail checksum
+        case 2: tail[6] = 6; break; // Count exceeds five
+        case 3: tail[68] ^= 1; break; // V2 tail checksum
         case 4:
             // First entry's ability is at offset 16. Recompute the tail
             // checksum so this case exercises ability-ID validation itself.
             tail[16] = 0;
             tail[17] = 0;
-            *(u16 *)&tail[56] = CalculateTestSaveChecksum(tail, 56);
+            *(u16 *)&tail[68] = CalculateTestSaveChecksum(tail, 68);
             break;
         }
         sector->checksum = CalculateTestSaveChecksum(sector->data, SECTOR_DATA_SIZE);
