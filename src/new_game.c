@@ -293,6 +293,8 @@ void NewGameInitData(void)
     gSaveBlock1Ptr->registeredShortcutsMagic = REGISTERED_SHORTCUTS_SAVE_MAGIC;
     gSaveBlock1Ptr->registeredShortcutsMagicInv = REGISTERED_SHORTCUTS_SAVE_MAGIC_INV;
     ClearBag();
+    // Phase 2 evolution test: provide Rare Candies in the new-game Bag.
+    AddBagItem(ITEM_RARE_CANDY, 10);
     NewGameInitPCItems();
     ClearPokeblocks();
     ClearDecorationInventories();
