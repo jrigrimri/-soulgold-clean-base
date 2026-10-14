@@ -335,6 +335,15 @@ void NewGameInitData(void)
     ClearFollowerNPCData();
     SetLastHealLocationWarp(HEAL_LOCATION_NEW_BARK_TOWN_PLAYERS_HOUSE_2F);
     TryInitializeClockFromRtc();
+
+    // AbilityNum3 experiment: provide a level 10 Combusken for in-game testing.
+    // This is intentionally limited to this experimental branch.
+    {
+        u8 customAbilityNum = 3;
+        CreateMon(&gPlayerParty[0], SPECIES_COMBUSKEN, 10, 0, OTID_STRUCT_PLAYER_ID);
+        SetMonData(&gPlayerParty[0], MON_DATA_ABILITY_NUM, &customAbilityNum);
+        gPlayerPartyCount = 1;
+    }
 }
 
 static void TryInitializeClockFromRtc(void)
