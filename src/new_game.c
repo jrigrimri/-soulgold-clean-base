@@ -336,13 +336,17 @@ void NewGameInitData(void)
     SetLastHealLocationWarp(HEAL_LOCATION_NEW_BARK_TOWN_PLAYERS_HOUSE_2F);
     TryInitializeClockFromRtc();
 
-    // AbilityNum3 experiment: provide a level 10 Combusken for in-game testing.
-    // This is intentionally limited to this experimental branch.
+    // AbilityNum3 Phase 2: two independent Combusken for ability isolation tests.
+    // Slot 1 uses Wonder Guard via selector 3; slot 2 uses its ordinary selector 0.
+    // Level 35 permits testing evolution to Blaziken after a level-up.
     {
         u8 customAbilityNum = 3;
-        CreateMon(&gPlayerParty[0], SPECIES_COMBUSKEN, 10, 0, OTID_STRUCT_PLAYER_ID);
+        u8 normalAbilityNum = 0;
+        CreateMon(&gPlayerParty[0], SPECIES_COMBUSKEN, 35, 0, OTID_STRUCT_PLAYER_ID);
         SetMonData(&gPlayerParty[0], MON_DATA_ABILITY_NUM, &customAbilityNum);
-        gPlayerPartyCount = 1;
+        CreateMon(&gPlayerParty[1], SPECIES_COMBUSKEN, 35, 0, OTID_STRUCT_PLAYER_ID);
+        SetMonData(&gPlayerParty[1], MON_DATA_ABILITY_NUM, &normalAbilityNum);
+        gPlayerPartyCount = 2;
     }
 }
 
