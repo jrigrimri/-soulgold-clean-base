@@ -43,3 +43,24 @@ TEST("SaveBlock3 custom ability storage fits and round-trips all 576 slots throu
     for (i = 0; i < CUSTOM_ABILITY_STORAGE_SLOTS; i++)
         EXPECT_EQ(restored.customAbilityIds[i], (i % 531) + 1);
 }
+
+// Phase 3.2 metadata checks; the actual flash Save/Load path still needs integration testing.
+TEST("SaveBlock3 custom ability metadata detects corrupted table data")
+{
+    u32 i;
+    u32 sum = 0;
+    for (i = 0; i < CUSTOM_ABILITY_STORAGE_SLOTS; i++)
+    {
+        gSaveBlock3Ptr->customAbilityIds[i] = i % 532;
+        sum = (sum + gSaveBlock3Ptr->customAbilityIds[i]) & 0xFFFF;
+    }
+    gSaveBlock3Ptr->customAbilityStorageMagic = 0x43414233;
+    gSaveBlock3Ptr->customAbilityStorageVersion = 1;
+    gSaveBlock3Ptr->customAbilityStorageChecksum = sum;
+    EXPECT_EQ(gSaveBlock3Ptr->customAbilityStorageChecksum, sum);
+    gSaveBlock3Ptr->customAbilityIds[42] ^= 1;
+    sum = 0;
+    for (i = 0; i < CUSTOM_ABILITY_STORAGE_SLOTS; i++)
+        sum = (sum + gSaveBlock3Ptr->customAbilityIds[i]) & 0xFFFF;
+    EXPECT_NE(gSaveBlock3Ptr->customAbilityStorageChecksum, sum);
+}

@@ -1572,6 +1572,8 @@ u8 LoadGameSave(u8 saveType)
           || gPokemonStoragePtr->box18ExtensionMagic == POKEMON_STORAGE_BOX19_MAGIC
           || sLegacyHallOfFameRetryCounter != gSaveCounter))
             ClearLegacyHallOfFameRetryArchive();
+        if (status == SAVE_STATUS_OK && !IsCustomAbilityStorageValid())
+            InitializeCustomAbilityStorage();
         CopyPartyAndObjectsFromSave();
         gSaveFileStatus = status;
         gGameContinueCallback = NULL;
@@ -1761,6 +1763,34 @@ void Task_LinkFullSave(u8 taskId)
     }
 }
 
+// Phase 3.2: Validate the appended table independently of legacy save data.
+#define CUSTOM_ABILITY_STORAGE_MAGIC 0x43414233 // "CAB3"
+#define CUSTOM_ABILITY_STORAGE_VERSION 1
+
+static u16 CalculateCustomAbilityStorageChecksum(void)
+{
+    u32 i;
+    u32 sum = 0;
+    for (i = 0; i < ARRAY_COUNT(gSaveblock3.customAbilityIds); i++)
+        sum = (sum + gSaveblock3.customAbilityIds[i]) & 0xFFFF;
+    return (u16)sum;
+}
+
+static void InitializeCustomAbilityStorage(void)
+{
+    memset(gSaveblock3.customAbilityIds, 0, sizeof(gSaveblock3.customAbilityIds));
+    gSaveblock3.customAbilityStorageMagic = CUSTOM_ABILITY_STORAGE_MAGIC;
+    gSaveblock3.customAbilityStorageVersion = CUSTOM_ABILITY_STORAGE_VERSION;
+    gSaveblock3.customAbilityStorageChecksum = 0;
+}
+
+static bool8 IsCustomAbilityStorageValid(void)
+{
+    return gSaveblock3.customAbilityStorageMagic == CUSTOM_ABILITY_STORAGE_MAGIC
+        && gSaveblock3.customAbilityStorageVersion == CUSTOM_ABILITY_STORAGE_VERSION
+        && gSaveblock3.customAbilityStorageChecksum == CalculateCustomAbilityStorageChecksum();
+}
+
 static u32 SaveBlock3Size(u32 sectorId)
 {
     s32 begin = sectorId * SAVE_BLOCK_3_CHUNK_SIZE;
@@ -1777,5 +1807,8 @@ static void CopyToSaveBlock3(u32 sectorId, struct SaveSector *sector)
 static void CopyFromSaveBlock3(u32 sectorId, struct SaveSector *sector)
 {
     u32 size = SaveBlock3Size(sectorId);
+    if (!IsCustomAbilityStorageValid())
+        InitializeCustomAbilityStorage();
+    gSaveblock3.customAbilityStorageChecksum = CalculateCustomAbilityStorageChecksum();
     memcpy(sector->saveBlock3Chunk, (u8 *)&gSaveblock3 + (sectorId * SAVE_BLOCK_3_CHUNK_SIZE), size);
 }
