@@ -25,6 +25,7 @@ static void CopyToSaveBlock3(u32, struct SaveSector *);
 static void CopyFromSaveBlock3(u32, struct SaveSector *);
 static void InitializeCustomAbilityStorage(void);
 static bool8 IsCustomAbilityStorageValid(void);
+static void FinalizeCustomAbilityStorageForSave(void);
 static bool8 PreparePokemonStorageExtensions(bool8);
 static void FinishPokemonStorageExtensions(bool8);
 static bool8 CopyPokemonStorageExtensionTailToSaveSector(u16);
@@ -1806,11 +1807,36 @@ static void CopyToSaveBlock3(u32 sectorId, struct SaveSector *sector)
     memcpy((u8 *)&gSaveblock3 + (sectorId * SAVE_BLOCK_3_CHUNK_SIZE), sector->saveBlock3Chunk, size);
 }
 
+static void FinalizeCustomAbilityStorageForSave(void)
+{
+    // A valid header permits intentional edits to the ability table before saving.
+    // Do not treat a stale checksum as corruption while the table is in RAM.
+    if (gSaveblock3.customAbilityStorageMagic != CUSTOM_ABILITY_STORAGE_MAGIC
+     || gSaveblock3.customAbilityStorageVersion != CUSTOM_ABILITY_STORAGE_VERSION)
+        InitializeCustomAbilityStorage();
+    gSaveblock3.customAbilityStorageChecksum = CalculateCustomAbilityStorageChecksum();
+}
+
 static void CopyFromSaveBlock3(u32 sectorId, struct SaveSector *sector)
 {
     u32 size = SaveBlock3Size(sectorId);
-    if (!IsCustomAbilityStorageValid())
-        InitializeCustomAbilityStorage();
-    gSaveblock3.customAbilityStorageChecksum = CalculateCustomAbilityStorageChecksum();
+    FinalizeCustomAbilityStorageForSave();
     memcpy(sector->saveBlock3Chunk, (u8 *)&gSaveblock3 + (sectorId * SAVE_BLOCK_3_CHUNK_SIZE), size);
 }
+
+#if TESTING
+bool8 CustomAbilityStorage_TestIsValid(void)
+{
+    return IsCustomAbilityStorageValid();
+}
+
+void CustomAbilityStorage_TestInitialize(void)
+{
+    InitializeCustomAbilityStorage();
+}
+
+void CustomAbilityStorage_TestFinalizeForSave(void)
+{
+    FinalizeCustomAbilityStorageForSave();
+}
+#endif

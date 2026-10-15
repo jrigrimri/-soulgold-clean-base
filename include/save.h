@@ -121,6 +121,9 @@ extern u16 gSaveAttemptStatus;
 // save_failed_screen.c
 void DoSaveFailedScreen(u8 saveType);
 #if TESTING
+bool8 CustomAbilityStorage_TestIsValid(void);
+void CustomAbilityStorage_TestInitialize(void);
+void CustomAbilityStorage_TestFinalizeForSave(void);
 bool8 SaveFailedScreen_TestWipeDamagedSectors(void);
 #endif
 
