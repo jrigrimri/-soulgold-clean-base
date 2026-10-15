@@ -537,7 +537,12 @@ TEST("SaveBlock2 is backwards compatible")
 
 TEST("SaveBlock3 is backwards compatible")
 {
-    EXPECT_EQ(sizeof(struct SaveBlock3), T_SAVEBLOCK3_SIZE);
+    // The legacy prefix must remain byte-for-byte layout compatible.
+    EXPECT_EQ(offsetof(struct SaveBlock3, customAbilityStorageMagic), T_SAVEBLOCK3_SIZE);
+    EXPECT_EQ(offsetof(struct SaveBlock3, customAbilityStorageVersion), T_SAVEBLOCK3_SIZE + sizeof(u32));
+    EXPECT_EQ(offsetof(struct SaveBlock3, customAbilityStorageChecksum), T_SAVEBLOCK3_SIZE + sizeof(u32) + sizeof(u16));
+    EXPECT_EQ(offsetof(struct SaveBlock3, customAbilityIds), T_SAVEBLOCK3_SIZE + sizeof(u32) + 2 * sizeof(u16));
+    EXPECT_EQ(sizeof(struct SaveBlock3), T_SAVEBLOCK3_SIZE + sizeof(u32) + 2 * sizeof(u16) + 576 * sizeof(u16));
 }
 
 TEST("PokemonStorage is backwards compatible")
