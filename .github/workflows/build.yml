@@ -6,6 +6,7 @@ on:
       - master
       - upcoming
       - feature/custom-abilitynum3
+      - feature/saveblock3-custom-ability-storage
   pull_request:
 
 env:

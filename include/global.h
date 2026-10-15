@@ -285,6 +285,14 @@ struct SaveBlock3
     u8 apricornTrees[NUM_APRICORN_TREE_BYTES];
 #endif
     u32 candyJarExp;
+
+    // Phase 3 storage probe. Appended so existing SaveBlock3 offsets remain stable.
+    // 19 PC boxes * 30 slots + 6 party slots = 576 ability IDs.
+    // These fields are not wired to battle ability resolution yet.
+    u32 customAbilityStorageMagic;
+    u16 customAbilityStorageVersion;
+    u16 customAbilityStorageChecksum;
+    u16 customAbilityIds[576];
 }; /* max size 1624 bytes */
 
 extern struct SaveBlock3 *gSaveBlock3Ptr;
