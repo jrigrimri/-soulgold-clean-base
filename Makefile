@@ -408,15 +408,25 @@ endif
 check: TEST_SKIP_DUPLICATE_TRAIT_TESTS := \x01
 check-all: TEST_SKIP_DUPLICATE_TRAIT_TESTS := \x00
 check check-all: $(TEST_SHARD_ELFS)
-	@set -e; \
+	@failed=0; \
 	printf 'Running %s test shard(s). Each test summary below is for one shard, not the full suite.\n' "$(words $^)"; \
 	for elf in $^; do \
 		headless="$${elf%.elf}-headless.elf"; \
 		printf '\n== Running %s ==\n' "$$elf"; \
-		cp "$$elf" "$$headless"; \
-		$(PATCHELF) "$$headless" gTestRunnerHeadless '\x01' gTestRunnerSkipIsFail "$(TEST_SKIP_IS_FAIL)" gTestRunnerSkipDuplicateTraitTests "$(TEST_SKIP_DUPLICATE_TRAIT_TESTS)"; \
-		$(ROMTESTHYDRA) $(ROMTEST) $(OBJCOPY) "$$headless"; \
-	done
+		if cp "$$elf" "$$headless" \
+		   && $(PATCHELF) "$$headless" gTestRunnerHeadless '\x01' gTestRunnerSkipIsFail "$(TEST_SKIP_IS_FAIL)" gTestRunnerSkipDuplicateTraitTests "$(TEST_SKIP_DUPLICATE_TRAIT_TESTS)" \
+		   && $(ROMTESTHYDRA) $(ROMTEST) $(OBJCOPY) "$$headless"; then \
+			printf '== PASS: %s ==\n' "$$elf"; \
+		else \
+			printf '== FAIL: %s ==\n' "$$elf"; \
+			failed=1; \
+		fi; \
+	done; \
+	if [ "$$failed" -ne 0 ]; then \
+		printf '\nOne or more test shards failed.\n'; \
+		exit 1; \
+	fi; \
+	printf '\nAll test shards passed.\n'
 
 # Other rules
 check-song-config:
