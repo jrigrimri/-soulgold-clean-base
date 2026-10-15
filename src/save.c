@@ -23,6 +23,8 @@ static u8 HandleWriteSector(u16, const struct SaveSectorLocation *);
 static u8 HandleReplaceSector(u16, const struct SaveSectorLocation *);
 static void CopyToSaveBlock3(u32, struct SaveSector *);
 static void CopyFromSaveBlock3(u32, struct SaveSector *);
+static void InitializeCustomAbilityStorage(void);
+static bool8 IsCustomAbilityStorageValid(void);
 static bool8 PreparePokemonStorageExtensions(bool8);
 static void FinishPokemonStorageExtensions(bool8);
 static bool8 CopyPokemonStorageExtensionTailToSaveSector(u16);
