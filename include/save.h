@@ -122,6 +122,9 @@ extern u16 gSaveAttemptStatus;
 void DoSaveFailedScreen(u8 saveType);
 #if TESTING
 bool8 CustomAbilityStorage_TestIsValid(void);
+void CustomAbilityStorage_TestWriteSector(u32 sectorId, struct SaveSector *sector);
+void CustomAbilityStorage_TestReadSector(u32 sectorId, struct SaveSector *sector);
+void CustomAbilityStorage_TestValidateLoadedData(void);
 void CustomAbilityStorage_TestInitialize(void);
 void CustomAbilityStorage_TestFinalizeForSave(void);
 bool8 SaveFailedScreen_TestWipeDamagedSectors(void);

@@ -105,3 +105,64 @@ TEST("SaveBlock3 invalid magic version and checksum are rejected")
     gSaveBlock3Ptr->customAbilityIds[575] = 531;
     EXPECT_EQ(CustomAbilityStorage_TestIsValid(), FALSE);
 }
+
+TEST("SaveBlock3 production sector serialization round-trips all 576 IDs")
+{
+    struct SaveSector sectors[NUM_SECTORS_PER_SLOT] = {0};
+    u32 i;
+    u32 originalExp = gSaveBlock3Ptr->candyJarExp;
+    CustomAbilityStorage_TestInitialize();
+    for (i = 0; i < CUSTOM_ABILITY_STORAGE_SLOTS; i++)
+        gSaveBlock3Ptr->customAbilityIds[i] = (i % 531) + 1;
+    for (i = 0; i < NUM_SECTORS_PER_SLOT; i++)
+        CustomAbilityStorage_TestWriteSector(i, &sectors[i]);
+    EXPECT_EQ(CustomAbilityStorage_TestIsValid(), TRUE);
+    CustomAbilityStorage_TestInitialize();
+    for (i = 0; i < NUM_SECTORS_PER_SLOT; i++)
+        CustomAbilityStorage_TestReadSector(i, &sectors[i]);
+    EXPECT_EQ(CustomAbilityStorage_TestIsValid(), TRUE);
+    for (i = 0; i < CUSTOM_ABILITY_STORAGE_SLOTS; i++)
+        EXPECT_EQ(gSaveBlock3Ptr->customAbilityIds[i], (i % 531) + 1);
+    EXPECT_EQ(gSaveBlock3Ptr->candyJarExp, originalExp);
+}
+
+TEST("SaveBlock3 loaded corruption resets extension but retains legacy data")
+{
+    struct SaveSector sectors[NUM_SECTORS_PER_SLOT] = {0};
+    u32 i;
+    u32 originalExp = gSaveBlock3Ptr->candyJarExp;
+    CustomAbilityStorage_TestInitialize();
+    gSaveBlock3Ptr->customAbilityIds[575] = 531;
+    for (i = 0; i < NUM_SECTORS_PER_SLOT; i++)
+        CustomAbilityStorage_TestWriteSector(i, &sectors[i]);
+    // Corrupt one stored ability byte after serialization.
+    for (i = 0; i < NUM_SECTORS_PER_SLOT; i++)
+        CustomAbilityStorage_TestReadSector(i, &sectors[i]);
+    gSaveBlock3Ptr->customAbilityIds[575] ^= 1;
+    EXPECT_EQ(CustomAbilityStorage_TestIsValid(), FALSE);
+    CustomAbilityStorage_TestValidateLoadedData();
+    EXPECT_EQ(CustomAbilityStorage_TestIsValid(), TRUE);
+    EXPECT_EQ(gSaveBlock3Ptr->customAbilityIds[575], 0);
+    EXPECT_EQ(gSaveBlock3Ptr->candyJarExp, originalExp);
+}
+
+TEST("SaveBlock3 legacy sector chunks initialize extension on load")
+{
+    struct SaveSector sectors[NUM_SECTORS_PER_SLOT] = {0};
+    u32 i;
+    CustomAbilityStorage_TestInitialize();
+    for (i = 0; i < NUM_SECTORS_PER_SLOT; i++)
+        CustomAbilityStorage_TestWriteSector(i, &sectors[i]);
+    // Older saves contain only the original 0x64 bytes of SaveBlock3.
+    for (i = 0; i < NUM_SECTORS_PER_SLOT; i++)
+        memset(sectors[i].saveBlock3Chunk, 0, sizeof(sectors[i].saveBlock3Chunk));
+    for (i = 0; i < NUM_SECTORS_PER_SLOT; i++)
+        CustomAbilityStorage_TestReadSector(i, &sectors[i]);
+    EXPECT_EQ(CustomAbilityStorage_TestIsValid(), FALSE);
+    CustomAbilityStorage_TestValidateLoadedData();
+    EXPECT_EQ(CustomAbilityStorage_TestIsValid(), TRUE);
+    EXPECT_EQ(gSaveBlock3Ptr->customAbilityIds[0], 0);
+    EXPECT_EQ(gSaveBlock3Ptr->customAbilityIds[575], 0);
+    // The validator must not modify existing legacy fields.
+    EXPECT_EQ(gSaveBlock3Ptr->candyJarExp, 0);
+}

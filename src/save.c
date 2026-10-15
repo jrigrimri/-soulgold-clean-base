@@ -1840,3 +1840,21 @@ void CustomAbilityStorage_TestFinalizeForSave(void)
     FinalizeCustomAbilityStorageForSave();
 }
 #endif
+
+#if TESTING
+void CustomAbilityStorage_TestWriteSector(u32 sectorId, struct SaveSector *sector)
+{
+    CopyFromSaveBlock3(sectorId, sector);
+}
+
+void CustomAbilityStorage_TestReadSector(u32 sectorId, struct SaveSector *sector)
+{
+    CopyToSaveBlock3(sectorId, sector);
+}
+
+void CustomAbilityStorage_TestValidateLoadedData(void)
+{
+    if (!IsCustomAbilityStorageValid())
+        InitializeCustomAbilityStorage();
+}
+#endif
