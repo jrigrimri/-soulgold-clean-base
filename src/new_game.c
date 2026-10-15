@@ -295,9 +295,9 @@ void NewGameInitData(void)
     ClearBag();
     // New-game save blocks were cleared; refresh Bag pocket pointers before adding items.
     SetBagItemsPointers();
-    // Phase 2 evolution test: provide Rare Candies in the new-game Bag.
-    AddBagItem(ITEM_RARE_CANDY, 10);
     NewGameInitPCItems();
+    // Phase 2 evolution test: store Rare Candies in the PC after PC item initialization.
+    AddPCItem(ITEM_RARE_CANDY, 10);
     ClearPokeblocks();
     ClearDecorationInventories();
     InitEasyChatPhrases();
