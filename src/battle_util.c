@@ -9420,7 +9420,7 @@ static inline u32 CalcDefenseStat(struct BattleContext *ctx)
     if (!BattlerHasTrait(ctx->battlerAtk, ABILITY_OVERLOAD) && SearchItemSlots(battlerItems, HOLD_EFFECT_ASSAULT_VEST))
     {
         if (!usesDefStat)
-            modifier = uq4_12_multiply_half_down(modifier, UQ_4_12(1.5));
+            modifier = uq4_12_multiply_half_down(modifier, IsOnPlayerSide(battlerDef) ? UQ_4_12(2.0) : UQ_4_12(1.5));
     }
     if (SearchItemSlots(battlerItems, HOLD_EFFECT_SOUL_DEW))
     {
@@ -9833,7 +9833,7 @@ static inline uq4_12_t GetAttackerItemsModifier(enum BattlerId battlerAtk, uq4_1
          && typeEffectivenessModifier >= UQ_4_12(2.0))
         {
             firstBelt = FALSE;
-            percentBoost = uq4_12_multiply_half_down(percentBoost, UQ_4_12(1.2));
+            percentBoost = uq4_12_multiply_half_down(percentBoost, IsOnPlayerSide(battlerAtk) ? UQ_4_12(1.4) : UQ_4_12(1.2));
         }
 
         if (GetItemHoldEffect(item) == HOLD_EFFECT_LIFE_ORB && (firstOrb || GetConfig(B_ALLOW_HELD_DUPES)))
