@@ -3787,6 +3787,10 @@ bool8 PokemonUseItemEffects(struct Pokemon *mon, enum Item item, u8 partyIndex, 
 
                         // Get amount of HP to restore
                         dataUnsigned = itemEffect[itemEffectParam++];
+                        if (!usedByAI && item == ITEM_ORAN_BERRY)
+                            dataUnsigned = 80;
+                        else if (!usedByAI && item == ITEM_SITRUS_BERRY)
+                            dataUnsigned = ITEM6_HEAL_HP_FULL;
                         switch (dataUnsigned)
                         {
                         case ITEM6_HEAL_HP_FULL:
@@ -3833,7 +3837,7 @@ bool8 PokemonUseItemEffects(struct Pokemon *mon, enum Item item, u8 partyIndex, 
                                 ppBonus = CalculatePPWithBonus(move, GetMonData(mon, MON_DATA_PP_BONUSES), temp2);
                                 if (dataUnsigned != ppBonus)
                                 {
-                                    dataUnsigned += itemEffect[itemEffectParam];
+                                    dataUnsigned += (!usedByAI && item == ITEM_LEPPA_BERRY) ? 30 : itemEffect[itemEffectParam];
                                     if (dataUnsigned > ppBonus)
                                         dataUnsigned = ppBonus;
                                     SetMonData(mon, MON_DATA_PP1 + temp2, &dataUnsigned);
