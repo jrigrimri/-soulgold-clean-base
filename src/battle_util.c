@@ -2090,7 +2090,10 @@ bool32 BattleArenaTurnEnd(void)
 s32 GetDrainedBigRootHp(enum BattlerId battler, s32 hp)
 {
     if (BattlerHasHeldItemEffect(battler, HOLD_EFFECT_BIG_ROOT, TRUE))
-        hp = (hp * 1300) / 1000;
+    {
+        s32 multiplier = IsOnPlayerSide(battler) ? 2000 : 1300;
+        hp = (s32)((s64)hp * multiplier / 1000);
+    }
     if (hp == 0)
         hp = 1;
 
@@ -8786,6 +8789,8 @@ static inline u32 CalcMoveBasePowerAfterModifiers(struct BattleContext *ctx, u32
              && IsBattleMovePhysical(move))
             {
                 ITEM_EFFECT_PARAM_ATK(battlerItems[i]);
+                if (IsOnPlayerSide(battlerAtk))
+                    holdEffectParamAtk = 25;
                 modifier = uq4_12_multiply(modifier, uq4_12_add(UQ_4_12(1.0), PercentToUQ4_12_Floored(holdEffectParamAtk)));
                 if (!GetConfig(B_ALLOW_HELD_DUPES))
                     i = MAX_MON_ITEMS;
@@ -8794,6 +8799,8 @@ static inline u32 CalcMoveBasePowerAfterModifiers(struct BattleContext *ctx, u32
              && IsBattleMoveSpecial(move))
             {
                 ITEM_EFFECT_PARAM_ATK(battlerItems[i]);
+                if (IsOnPlayerSide(battlerAtk))
+                    holdEffectParamAtk = 25;
                 modifier = uq4_12_multiply(modifier, uq4_12_add(UQ_4_12(1.0), PercentToUQ4_12_Floored(holdEffectParamAtk)));
                 if (!GetConfig(B_ALLOW_HELD_DUPES))
                     i = MAX_MON_ITEMS;
@@ -13398,7 +13405,10 @@ u32 GetTotalAccuracy(enum BattlerId battlerAtk, enum BattlerId battlerDef, enum 
 
     // Target's hold effect
     if (!BattlerHasTrait(battlerAtk, ABILITY_OVERLOAD) && BattlerHasHeldItemEffect(battlerDef, HOLD_EFFECT_EVASION_UP, TRUE))
-        calc = (calc * (100 - GetBattlerItemHoldEffectParam(battlerDef, GetBattlerHeldItemWithEffect(battlerDef, HOLD_EFFECT_EVASION_UP, TRUE)))) / 100;
+    {
+        u32 evasionParam = IsOnPlayerSide(battlerDef) ? 50 : GetBattlerItemHoldEffectParam(battlerDef, GetBattlerHeldItemWithEffect(battlerDef, HOLD_EFFECT_EVASION_UP, TRUE));
+        calc = (calc * (100 - evasionParam)) / 100;
+    }
 
 
     if (gBattleStruct->battlerState[battlerAtk].usedMicleBerry)
