@@ -5453,8 +5453,10 @@ static void SetActionsAndBattlersTurnOrder(void)
                         item = GetSlotHeldItem(battler, i, TRUE);
 
                         if (GetBattlerItemHoldEffect(battler, item) == HOLD_EFFECT_QUICK_CLAW && (quickChance == 0 || GetConfig(B_ALLOW_HELD_DUPES)))
+                        {
                             u32 chance = IsOnPlayerSide(battler) ? 75 : GetItemHoldEffectParam(item);
                             quickChance += (100 - quickChance) * chance / 100;
+                        }
                     }
 
                     gActionsByTurnOrder[turnOrderId] = gChosenActionByBattler[battler];
