@@ -5,6 +5,7 @@ on:
     branches:
       - master
       - upcoming
+      - integration/ev999-item-modify-clean
   pull_request:
 
 env:
