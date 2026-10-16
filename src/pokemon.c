@@ -3855,7 +3855,8 @@ bool8 PokemonUseItemEffects(struct Pokemon *mon, enum Item item, u8 partyIndex, 
                             u32 ppBonus = CalculatePPWithBonus(move, GetMonData(mon, MON_DATA_PP_BONUSES), moveIndex);
                             if (dataUnsigned != ppBonus)
                             {
-                                dataUnsigned += itemEffect[itemEffectParam++];
+                                dataUnsigned += (!usedByAI && item == ITEM_LEPPA_BERRY) ? 30 : itemEffect[itemEffectParam];
+                                itemEffectParam++;
                                 if (dataUnsigned > ppBonus)
                                     dataUnsigned = ppBonus;
                                 SetMonData(mon, MON_DATA_PP1 + moveIndex, &dataUnsigned);
