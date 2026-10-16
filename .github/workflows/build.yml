@@ -108,6 +108,25 @@ jobs:
         timeout-minutes: 45
         run: make -j$(nproc) check
 
+  saveblock3-focused-tests:
+    if: github.actor != 'allcontributors[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GAME_VERSION: EMERALD
+      TEST: 1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends binutils-arm-none-eabi gcc-arm-none-eabi libnewlib-arm-none-eabi libpng-dev python3
+
+      - name: Run focused SaveBlock3 tests
+        run: make -j$(nproc) check TESTS='SaveBlock3*' TEST_SHARDS=3
+
   docs_validate:
     if: github.actor != 'allcontributors[bot]'
     runs-on: ubuntu-latest
