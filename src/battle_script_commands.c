@@ -13042,6 +13042,10 @@ void BS_ItemRestoreHP(void)
     u16 healAmount;
     enum BattlerId battler = MAX_BATTLERS_COUNT;
     u32 healParam = GetItemEffect(gLastUsedItem)[6];
+    if (IsOnPlayerSide(gBattlerAttacker) && gLastUsedItem == ITEM_ORAN_BERRY)
+        healParam = 80;
+    else if (IsOnPlayerSide(gBattlerAttacker) && gLastUsedItem == ITEM_SITRUS_BERRY)
+        healParam = ITEM6_HEAL_HP_FULL;
     struct Pokemon *party = GetBattlerParty(gBattlerAttacker);
     u16 hp = GetMonData(&party[gBattleStruct->itemPartyIndex[gBattlerAttacker]], MON_DATA_HP);
     u16 maxHP = GetMonData(&party[gBattleStruct->itemPartyIndex[gBattlerAttacker]], MON_DATA_MAX_HP);
@@ -13208,7 +13212,7 @@ void BS_ItemRestorePP(void)
         maxPP = CalculatePPWithBonus(moveId, GetMonData(mon, MON_DATA_PP_BONUSES), i);
         if (pp != maxPP)
         {
-            pp += effect[6];
+            pp += (IsOnPlayerSide(gBattlerAttacker) && gLastUsedItem == ITEM_LEPPA_BERRY) ? 30 : effect[6];
             if (pp > maxPP)
                 pp = maxPP;
             SetMonData(mon, MON_DATA_PP1 + i, &pp);
