@@ -744,7 +744,7 @@ const struct ItemInfo gItemsInfo[] =
     {
         .name = ITEM_NAME("Potion"),
         .price = (I_PRICE >= GEN_7) ? 200 : 300,
-        .holdEffectParam = 20,
+        .holdEffectParam = 100,
         .description = COMPOUND_STRING(
             "Restores the HP of\n"
             "a Pokémon by\n"
@@ -765,7 +765,7 @@ const struct ItemInfo gItemsInfo[] =
     {
         .name = ITEM_NAME("Super Potion"),
         .price = 700,
-        .holdEffectParam = 60,
+        .holdEffectParam = 200,
         .description = COMPOUND_STRING(
             "Restores the HP of\n"
             "a Pokémon by\n"
@@ -790,7 +790,7 @@ const struct ItemInfo gItemsInfo[] =
     {
         .name = ITEM_NAME("Hyper Potion"),
         .price = (I_PRICE >= GEN_2 && I_PRICE <= GEN_6) ? 1200 : 1500,
-        .holdEffectParam = 120,
+        .holdEffectParam = 250,
         .description = COMPOUND_STRING(
             "Restores the HP of\n"
             "a Pokémon by\n"
@@ -893,7 +893,7 @@ const struct ItemInfo gItemsInfo[] =
     {
         .name = ITEM_NAME("Fresh Water"),
         .price = 200,
-        .holdEffectParam = 30,
+        .holdEffectParam = 100,
         .description = COMPOUND_STRING(
             "A mineral water\n"
             "that restores HP\n"
@@ -918,7 +918,7 @@ const struct ItemInfo gItemsInfo[] =
     {
         .name = ITEM_NAME("Soda Pop"),
         .price = 300,
-        .holdEffectParam = 50,
+        .holdEffectParam = 150,
         .description = COMPOUND_STRING(
             "A fizzy soda drink\n"
             "that restores HP\n"
@@ -943,7 +943,7 @@ const struct ItemInfo gItemsInfo[] =
     {
         .name = ITEM_NAME("Lemonade"),
         .price = (I_PRICE >= GEN_7) ? 400 : 350,
-        .holdEffectParam = 70,
+        .holdEffectParam = 200,
         .description = COMPOUND_STRING(
             "A very sweet drink\n"
             "that restores HP\n"
@@ -968,7 +968,7 @@ const struct ItemInfo gItemsInfo[] =
     {
         .name = ITEM_NAME("Moomoo Milk"),
         .price = (I_PRICE >= GEN_7) ? 600 : 500,
-        .holdEffectParam = 100,
+        .holdEffectParam = 250,
         .description = COMPOUND_STRING(
             "A nutritious milk\n"
             "that restores HP\n"
@@ -1207,7 +1207,7 @@ const struct ItemInfo gItemsInfo[] =
     {
         .name = ITEM_NAME("Ether"),
         .price = (I_PRICE >= GEN_2) ? 1200 : 1,
-        .holdEffectParam = 10,
+        .holdEffectParam = 40,
         .description = COMPOUND_STRING(
             "Restores the PP\n"
             "of a selected move\n"
@@ -1249,7 +1249,7 @@ const struct ItemInfo gItemsInfo[] =
     {
         .name = ITEM_NAME("Elixir"),
         .price = (I_PRICE >= GEN_2) ? 3000 : 1,
-        .holdEffectParam = 10,
+        .holdEffectParam = 40,
         .description = COMPOUND_STRING(
             "Restores the PP\n"
             "of all moves by 10."),
@@ -1291,7 +1291,7 @@ const struct ItemInfo gItemsInfo[] =
         .name = ITEM_NAME("Berry Juice"),
         .price = 100,
         .holdEffect = HOLD_EFFECT_RESTORE_HP,
-        .holdEffectParam = 20,
+        .holdEffectParam = 100,
         .description = COMPOUND_STRING(
             "A 100% pure juice\n"
             "that restores HP\n"
@@ -1332,7 +1332,7 @@ const struct ItemInfo gItemsInfo[] =
     {
         .name = ITEM_NAME("Sweet Heart"),
         .price = (I_PRICE >= GEN_7) ? 3000 : 100,
-        .holdEffectParam = 20,
+        .holdEffectParam = 100,
         .description = COMPOUND_STRING(
             "A sweet chocolate\n"
             "that restores HP\n"
