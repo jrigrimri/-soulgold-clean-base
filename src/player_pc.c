@@ -220,7 +220,36 @@ static const struct MenuAction sItemStorage_MenuActions[] =
 
 static const u16 sNewGamePCItems[][2] =
 {
-    { ITEM_POTION, 1 },
+    // New-game testing stock: all modified items, 10 of each.
+    { ITEM_POTION, 10 },
+    { ITEM_SUPER_POTION, 10 },
+    { ITEM_HYPER_POTION, 10 },
+    { ITEM_FRESH_WATER, 10 },
+    { ITEM_SODA_POP, 10 },
+    { ITEM_LEMONADE, 10 },
+    { ITEM_MOOMOO_MILK, 10 },
+    { ITEM_ENERGY_POWDER, 10 },
+    { ITEM_ENERGY_ROOT, 10 },
+    { ITEM_BERRY_JUICE, 10 },
+    { ITEM_SWEET_HEART, 10 },
+    { ITEM_REVIVE, 10 },
+    { ITEM_ETHER, 10 },
+    { ITEM_ELIXIR, 10 },
+    { ITEM_ORAN_BERRY, 10 },
+    { ITEM_SITRUS_BERRY, 10 },
+    { ITEM_LEPPA_BERRY, 10 },
+    { ITEM_LEFTOVERS, 10 },
+    { ITEM_SHELL_BELL, 10 },
+    { ITEM_MUSCLE_BAND, 10 },
+    { ITEM_WISE_GLASSES, 10 },
+    { ITEM_EXPERT_BELT, 10 },
+    { ITEM_QUICK_CLAW, 10 },
+    { ITEM_BIG_ROOT, 10 },
+    { ITEM_ROCKY_HELMET, 10 },
+    { ITEM_ASSAULT_VEST, 10 },
+    { ITEM_BRIGHT_POWDER, 10 },
+    { ITEM_LAX_INCENSE, 10 },
+    { ITEM_POKE_BALL, 10 },
     { ITEM_NONE, 0 }
 };
 
