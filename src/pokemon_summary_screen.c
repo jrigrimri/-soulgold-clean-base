@@ -290,7 +290,7 @@ static enum Ability GetEv999TestSummaryAbility(void)
     if (sum->species == SPECIES_LATIOS
      && (sum->pid == 100200 + NATURE_MODEST || sum->pid == 100300 + NATURE_MODEST))
         return ABILITY_SPEED_BOOST;
-    return GetEv999TestSummaryAbility();
+    return GetAbilityBySpecies(sum->species, sum->abilityNum);
 }
 
 static void PrintMonAbilityName(void);
