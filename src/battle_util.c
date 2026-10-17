@@ -13406,7 +13406,10 @@ u32 GetTotalAccuracy(enum BattlerId battlerAtk, enum BattlerId battlerDef, enum 
     // Target's hold effect
     if (!BattlerHasTrait(battlerAtk, ABILITY_OVERLOAD) && BattlerHasHeldItemEffect(battlerDef, HOLD_EFFECT_EVASION_UP, TRUE))
     {
-        u32 evasionParam = IsOnPlayerSide(battlerDef) ? 50 : GetBattlerItemHoldEffectParam(battlerDef, GetBattlerHeldItemWithEffect(battlerDef, HOLD_EFFECT_EVASION_UP, TRUE));
+        enum Item evasionItem = GetBattlerHeldItemWithEffect(battlerDef, HOLD_EFFECT_EVASION_UP, TRUE);
+        u32 evasionParam = (IsOnPlayerSide(battlerDef) && evasionItem == ITEM_BRIGHT_POWDER) ? 100
+                         : IsOnPlayerSide(battlerDef) ? 50
+                         : GetBattlerItemHoldEffectParam(battlerDef, evasionItem);
         calc = (calc * (100 - evasionParam)) / 100;
     }
 
