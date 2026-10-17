@@ -12129,15 +12129,15 @@ const struct ItemInfo gItemsInfo[] =
         .holdEffectParam = 25,
         .description = COMPOUND_STRING(
             "A hold item that\n"
-            "restores the user's\n"
-            "HP a little."),
+            "fully restores the\n"
+            "holder's HP (player)."),
     #else
         .holdEffect = HOLD_EFFECT_RESTORE_HP,
         .holdEffectParam = 30,
         .description = COMPOUND_STRING(
             "A hold item that\n"
-            "restores 30 HP in\n"
-            "battle."),
+            "fully restores HP\n"
+            "for player's Pokémon."),
     #endif
         .pocket = POCKET_BERRIES,
         .heldSlot = 0,
