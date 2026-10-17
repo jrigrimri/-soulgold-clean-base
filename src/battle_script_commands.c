@@ -13012,7 +13012,7 @@ void ApplyExperienceMultipliers(s32 *expAmount, u8 expGetterMonId, u8 faintedBat
          && (firstEgg || GetConfig(B_ALLOW_HELD_DUPES)))
             {
                 firstEgg = FALSE;
-                *expAmount = (*expAmount * 150) / 100;
+                *expAmount = (*expAmount * 800) / 100;
             }
     }
     if (IsTradedMon(&gPlayerParty[expGetterMonId]))
