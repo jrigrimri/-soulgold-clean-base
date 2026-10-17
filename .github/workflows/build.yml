@@ -6,6 +6,7 @@ on:
       - master
       - upcoming
       - integration/ev999-item-modify-clean
+      - release-candidate/ev999-items-test-party
   pull_request:
 
 env:
