@@ -284,6 +284,26 @@ void NewGameInitData(void)
     gPlayerPartyCount = 0;
     ZeroPlayerPartyMons();
     ResetPokemonStorageSystem();
+    // EV999 regression party. Four distinct Pokemon, each with six matching EVs.
+    {
+        static const u16 sSpecies[] = {SPECIES_UMBREON, SPECIES_UMBREON, SPECIES_LATIOS, SPECIES_LATIOS};
+        static const u8 sNatures[] = {NATURE_BOLD, NATURE_BOLD, NATURE_MODEST, NATURE_MODEST};
+        static const u32 sEvs[] = {255, 252, 255, 251};
+        u32 i, stat, nature, pid;
+        for (i = 0; i < ARRAY_COUNT(sSpecies); i++)
+        {
+            // Nature is PID % 25. Keep PIDs unique for later ability override.
+            pid = 100000 + i * 100 + sNatures[i];
+            CreateMonWithIVs(&gPlayerParty[i], sSpecies[i], 10, pid, OTID_STRUCT_PLAYER_ID, 31);
+            nature = sNatures[i];
+            SetMonData(&gPlayerParty[i], MON_DATA_HIDDEN_NATURE, &nature);
+            for (stat = 0; stat < NUM_STATS; stat++)
+                SetMonData(&gPlayerParty[i], MON_DATA_HP_EV + stat, &sEvs[i]);
+            GiveMonInitialMoveset(&gPlayerParty[i]);
+            CalculateMonStats(&gPlayerParty[i]);
+        }
+        gPlayerPartyCount = ARRAY_COUNT(sSpecies);
+    }
     ResetHallOfFameArchive();
     DeactivateAllRoamers();
     gSaveBlock1Ptr->registeredItemCompat = ITEM_NONE;
