@@ -244,6 +244,8 @@ static const u16 sNewGamePCItems[][2] =
     { ITEM_BRIGHT_POWDER, 10 },
     { ITEM_LAX_INCENSE, 10 },
     { ITEM_POKE_BALL, 10 },
+    { ITEM_AMULET_COIN, 10 },
+    { ITEM_LUCKY_EGG, 10 },
     { ITEM_NONE, 0 }
 };
 
