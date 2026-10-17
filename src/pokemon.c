@@ -3157,6 +3157,18 @@ enum Ability GetMonAbility(struct Pokemon *mon)
 {
     u16 species = GetMonData(mon, MON_DATA_SPECIES);
     u8 abilityNum = GetMonData(mon, MON_DATA_ABILITY_NUM);
+    // Temporary EV999 test-party ability override; never alter NPC abilities.
+    // These unique PIDs are assigned by NewGameInitData.
+    if (mon >= &gPlayerParty[0] && mon < &gPlayerParty[PARTY_SIZE])
+    {
+        u32 pid = GetMonData(mon, MON_DATA_PERSONALITY);
+        if (species == SPECIES_UMBREON
+         && (pid == 100000 + NATURE_BOLD || pid == 100100 + NATURE_BOLD))
+            return ABILITY_WONDER_GUARD;
+        if (species == SPECIES_LATIOS
+         && (pid == 100200 + NATURE_MODEST || pid == 100300 + NATURE_MODEST))
+            return ABILITY_SPEED_BOOST;
+    }
     return GetAbilityBySpecies(species, abilityNum);
 }
 
