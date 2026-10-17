@@ -748,7 +748,7 @@ const struct ItemInfo gItemsInfo[] =
         .description = COMPOUND_STRING(
             "Restores the HP of\n"
             "a Pokémon by\n"
-            "20 points."),
+            "100 points."),
         .pocket = POCKET_MEDICINE,
         .sortType = ITEM_TYPE_HEALTH_RECOVERY,
         .heldSlot = 0,
@@ -770,9 +770,9 @@ const struct ItemInfo gItemsInfo[] =
             "Restores the HP of\n"
             "a Pokémon by\n"
         #if I_HEALTH_RECOVERY >= GEN_7
-            "60 points."),
+            "200 points."),
         #else
-            "50 points."),
+            "200 points."),
         #endif
         .pocket = POCKET_MEDICINE,
         .sortType = ITEM_TYPE_HEALTH_RECOVERY,
@@ -795,9 +795,9 @@ const struct ItemInfo gItemsInfo[] =
             "Restores the HP of\n"
             "a Pokémon by\n"
         #if I_HEALTH_RECOVERY >= GEN_7
-            "120 points."),
+            "250 points."),
         #else
-            "200 points."),
+            "250 points."),
         #endif
         .pocket = POCKET_MEDICINE,
         .sortType = ITEM_TYPE_HEALTH_RECOVERY,
@@ -898,9 +898,9 @@ const struct ItemInfo gItemsInfo[] =
             "A mineral water\n"
             "that restores HP\n"
         #if I_HEALTH_RECOVERY >= GEN_7
-            "by 30 points."),
+            "by 100 points."),
         #else
-            "by 50 points."),
+            "by 100 points."),
         #endif
         .pocket = POCKET_MEDICINE,
         .sortType = ITEM_TYPE_HEALTH_RECOVERY,
@@ -923,9 +923,9 @@ const struct ItemInfo gItemsInfo[] =
             "A fizzy soda drink\n"
             "that restores HP\n"
         #if I_HEALTH_RECOVERY >= GEN_7
-            "by 50 points."),
+            "by 150 points."),
         #else
-            "by 60 points."),
+            "by 150 points."),
         #endif
         .pocket = POCKET_MEDICINE,
         .sortType = ITEM_TYPE_HEALTH_RECOVERY,
@@ -948,9 +948,9 @@ const struct ItemInfo gItemsInfo[] =
             "A very sweet drink\n"
             "that restores HP\n"
         #if I_HEALTH_RECOVERY >= GEN_7
-            "by 70 points."),
+            "by 200 points."),
         #else
-            "by 80 points."),
+            "by 200 points."),
         #endif
         .pocket = POCKET_MEDICINE,
         .sortType = ITEM_TYPE_HEALTH_RECOVERY,
@@ -972,7 +972,7 @@ const struct ItemInfo gItemsInfo[] =
         .description = COMPOUND_STRING(
             "A nutritious milk\n"
             "that restores HP\n"
-            "by 100 points."),
+            "by 250 points."),
         .pocket = POCKET_MEDICINE,
         .sortType = ITEM_TYPE_HEALTH_RECOVERY,
         .heldSlot = 0,
@@ -1211,7 +1211,7 @@ const struct ItemInfo gItemsInfo[] =
         .description = COMPOUND_STRING(
             "Restores the PP\n"
             "of a selected move\n"
-            "by 10."),
+            "by 40."),
         .pocket = POCKET_MEDICINE,
         .sortType = ITEM_TYPE_PP_RECOVERY,
         .heldSlot = 0,
@@ -1252,7 +1252,7 @@ const struct ItemInfo gItemsInfo[] =
         .holdEffectParam = 40,
         .description = COMPOUND_STRING(
             "Restores the PP\n"
-            "of all moves by 10."),
+            "of all moves by 40."),
         .pocket = POCKET_MEDICINE,
         .sortType = ITEM_TYPE_PP_RECOVERY,
         .heldSlot = 0,
@@ -1295,7 +1295,7 @@ const struct ItemInfo gItemsInfo[] =
         .description = COMPOUND_STRING(
             "A 100% pure juice\n"
             "that restores HP\n"
-            "by 20 points."),
+            "by 100 points."),
         .pocket = POCKET_MEDICINE,
         .sortType = ITEM_TYPE_HEALTH_RECOVERY,
         .heldSlot = 0,
@@ -1336,7 +1336,7 @@ const struct ItemInfo gItemsInfo[] =
         .description = COMPOUND_STRING(
             "A sweet chocolate\n"
             "that restores HP\n"
-            "by 20 points."),
+            "by 100 points."),
         .pocket = POCKET_MEDICINE,
         .sortType = ITEM_TYPE_HEALTH_RECOVERY,
         .heldSlot = 0,
@@ -12042,7 +12042,7 @@ const struct ItemInfo gItemsInfo[] =
         .holdEffectParam = 10,
         .description = COMPOUND_STRING(
             "A hold item that\n"
-            "restores 10 PP in\n"
+            "restores 30 PP in\n"
             "battle."),
         .pocket = POCKET_BERRIES,
         .heldSlot = 0,
@@ -12064,7 +12064,7 @@ const struct ItemInfo gItemsInfo[] =
         .holdEffectParam = 10,
         .description = COMPOUND_STRING(
             "A hold item that\n"
-            "restores 10 HP in\n"
+            "restores 80 HP in\n"
             "battle."),
         .pocket = POCKET_BERRIES,
         .heldSlot = 0,
