@@ -13049,6 +13049,26 @@ void BS_ItemRestoreHP(void)
         healParam = 80;
     else if (IsOnPlayerSide(gBattlerAttacker) && gLastUsedItem == ITEM_SITRUS_BERRY)
         healParam = ITEM6_HEAL_HP_FULL;
+    else if (IsOnPlayerSide(gBattlerAttacker))
+    {
+        switch (gLastUsedItem)
+        {
+        case ITEM_POTION: case ITEM_FRESH_WATER: case ITEM_BERRY_JUICE: case ITEM_SWEET_HEART:
+            healParam = 100;
+            break;
+        case ITEM_SUPER_POTION: case ITEM_LEMONADE:
+            healParam = 200;
+            break;
+        case ITEM_SODA_POP:
+            healParam = 150;
+            break;
+        case ITEM_HYPER_POTION: case ITEM_MOOMOO_MILK:
+            healParam = 250;
+            break;
+        default:
+            break;
+        }
+    }
     struct Pokemon *party = GetBattlerParty(gBattlerAttacker);
     u16 hp = GetMonData(&party[gBattleStruct->itemPartyIndex[gBattlerAttacker]], MON_DATA_HP);
     u16 maxHP = GetMonData(&party[gBattleStruct->itemPartyIndex[gBattlerAttacker]], MON_DATA_MAX_HP);
@@ -13215,7 +13235,9 @@ void BS_ItemRestorePP(void)
         maxPP = CalculatePPWithBonus(moveId, GetMonData(mon, MON_DATA_PP_BONUSES), i);
         if (pp != maxPP)
         {
-            pp += (IsOnPlayerSide(gBattlerAttacker) && gLastUsedItem == ITEM_LEPPA_BERRY) ? 30 : effect[6];
+            pp += (IsOnPlayerSide(gBattlerAttacker) && gLastUsedItem == ITEM_LEPPA_BERRY) ? 30
+                : (IsOnPlayerSide(gBattlerAttacker) && (gLastUsedItem == ITEM_ETHER || gLastUsedItem == ITEM_ELIXIR)) ? 40
+                : effect[6];
             if (pp > maxPP)
                 pp = maxPP;
             SetMonData(mon, MON_DATA_PP1 + i, &pp);
