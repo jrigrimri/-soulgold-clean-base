@@ -281,6 +281,18 @@ static void PrintInfoPageText(void);
 static void Task_PrintInfoPage(u8);
 static void PrintMonOTName(void);
 static void PrintMonOTID(void);
+static enum Ability GetEv999TestSummaryAbility(void)
+{
+    struct PokeSummary *sum = &sMonSummaryScreen->summary;
+    if (sum->species == SPECIES_UMBREON
+     && (sum->pid == 100000 + NATURE_BOLD || sum->pid == 100100 + NATURE_BOLD))
+        return ABILITY_WONDER_GUARD;
+    if (sum->species == SPECIES_LATIOS
+     && (sum->pid == 100200 + NATURE_MODEST || sum->pid == 100300 + NATURE_MODEST))
+        return ABILITY_SPEED_BOOST;
+    return GetEv999TestSummaryAbility();
+}
+
 static void PrintMonAbilityName(void);
 static void PrintMonAbilityDescription(void);
 static void BufferMonTrainerMemo(void);
@@ -3881,13 +3893,13 @@ static void PrintMonOTID(void)
 
 static void PrintMonAbilityName(void)
 {
-    enum Ability ability = GetAbilityBySpecies(sMonSummaryScreen->summary.species, sMonSummaryScreen->summary.abilityNum);
+    enum Ability ability = GetEv999TestSummaryAbility();
     PrintTextOnWindow(AddWindowFromTemplateList(sPageInfoTemplate, PSS_DATA_WINDOW_INFO_ABILITY), gAbilitiesInfo[ability].name, 0, 1, 0, 1);
 }
 
 static void PrintMonAbilityDescription(void)
 {
-    enum Ability ability = GetAbilityBySpecies(sMonSummaryScreen->summary.species, sMonSummaryScreen->summary.abilityNum);
+    enum Ability ability = GetEv999TestSummaryAbility();
     PrintTextOnWindow(AddWindowFromTemplateList(sPageInfoTemplate, PSS_DATA_WINDOW_INFO_ABILITY), gAbilitiesInfo[ability].description, 0, 17, 0, 0);
 }
 
@@ -4119,7 +4131,7 @@ static void PrintEggMemo(void)
         u8 windowId;
 
         if (innateIndex == 0)
-            trait = GetAbilityBySpecies(sMonSummaryScreen->summary.species, sMonSummaryScreen->summary.abilityNum);
+            trait = GetEv999TestSummaryAbility();
         else if (innateIndex <= MAX_MON_INNATES)
             trait = sum->innates[innateIndex - 1];
             
