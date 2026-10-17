@@ -3791,6 +3791,26 @@ bool8 PokemonUseItemEffects(struct Pokemon *mon, enum Item item, u8 partyIndex, 
                             dataUnsigned = 80;
                         else if (!usedByAI && item == ITEM_SITRUS_BERRY)
                             dataUnsigned = ITEM6_HEAL_HP_FULL;
+                        else if (!usedByAI)
+                        {
+                            switch (item)
+                            {
+                            case ITEM_POTION: case ITEM_FRESH_WATER: case ITEM_BERRY_JUICE: case ITEM_SWEET_HEART:
+                                dataUnsigned = 100;
+                                break;
+                            case ITEM_SUPER_POTION: case ITEM_LEMONADE:
+                                dataUnsigned = 200;
+                                break;
+                            case ITEM_SODA_POP:
+                                dataUnsigned = 150;
+                                break;
+                            case ITEM_HYPER_POTION: case ITEM_MOOMOO_MILK:
+                                dataUnsigned = 250;
+                                break;
+                            default:
+                                break;
+                            }
+                        }
                         switch (dataUnsigned)
                         {
                         case ITEM6_HEAL_HP_FULL:
@@ -3837,7 +3857,7 @@ bool8 PokemonUseItemEffects(struct Pokemon *mon, enum Item item, u8 partyIndex, 
                                 ppBonus = CalculatePPWithBonus(move, GetMonData(mon, MON_DATA_PP_BONUSES), temp2);
                                 if (dataUnsigned != ppBonus)
                                 {
-                                    dataUnsigned += (!usedByAI && item == ITEM_LEPPA_BERRY) ? 30 : itemEffect[itemEffectParam];
+                                    dataUnsigned += (!usedByAI && item == ITEM_LEPPA_BERRY) ? 30 : (!usedByAI && (item == ITEM_ETHER || item == ITEM_ELIXIR)) ? 40 : itemEffect[itemEffectParam];
                                     if (dataUnsigned > ppBonus)
                                         dataUnsigned = ppBonus;
                                     SetMonData(mon, MON_DATA_PP1 + temp2, &dataUnsigned);
@@ -3855,7 +3875,7 @@ bool8 PokemonUseItemEffects(struct Pokemon *mon, enum Item item, u8 partyIndex, 
                             u32 ppBonus = CalculatePPWithBonus(move, GetMonData(mon, MON_DATA_PP_BONUSES), moveIndex);
                             if (dataUnsigned != ppBonus)
                             {
-                                dataUnsigned += (!usedByAI && item == ITEM_LEPPA_BERRY) ? 30 : itemEffect[itemEffectParam];
+                                dataUnsigned += (!usedByAI && item == ITEM_LEPPA_BERRY) ? 30 : (!usedByAI && (item == ITEM_ETHER || item == ITEM_ELIXIR)) ? 40 : itemEffect[itemEffectParam];
                                 itemEffectParam++;
                                 if (dataUnsigned > ppBonus)
                                     dataUnsigned = ppBonus;
