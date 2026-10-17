@@ -6751,6 +6751,29 @@ static u32 GetTrainerMoneyToGive(u16 trainerId)
             moneyReward = 4 * lastMonLevel * gBattleStruct->moneyMultiplier * trainerMoney;
     }
 
+    // Player-only Amulet Coin: set the trainer prize to 5x its base value.
+    // Preserve Happy Hour's separate 2x bonus; do not stack vanilla Amulet Coin twice.
+    if (gBattleStruct->moneyMultiplier != 0)
+    {
+        u32 i, j;
+        bool32 hasAmuletCoin = FALSE;
+        for (i = 0; i < PARTY_SIZE && !hasAmuletCoin; i++)
+        {
+            if (GetMonData(&gPlayerParty[i], MON_DATA_SPECIES) == SPECIES_NONE)
+                continue;
+            for (j = 0; j < MAX_MON_ITEMS; j++)
+            {
+                if (GetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM + j) == ITEM_AMULET_COIN)
+                {
+                    hasAmuletCoin = TRUE;
+                    break;
+                }
+            }
+        }
+        if (hasAmuletCoin)
+            moneyReward = (moneyReward / gBattleStruct->moneyMultiplier) * 5 * (gBattleStruct->moneyMultiplierMove ? 2 : 1);
+    }
+
     return moneyReward;
 }
 
@@ -13012,7 +13035,7 @@ void ApplyExperienceMultipliers(s32 *expAmount, u8 expGetterMonId, u8 faintedBat
          && (firstEgg || GetConfig(B_ALLOW_HELD_DUPES)))
             {
                 firstEgg = FALSE;
-                *expAmount = (*expAmount * 150) / 100;
+                *expAmount = (*expAmount * 800) / 100;
             }
     }
     if (IsTradedMon(&gPlayerParty[expGetterMonId]))
