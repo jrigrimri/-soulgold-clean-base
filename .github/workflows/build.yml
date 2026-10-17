@@ -6,6 +6,7 @@ on:
       - master
       - upcoming
       - integration/ev999-item-modify-clean
+      - test/amulet-coin-lucky-egg
   pull_request:
 
 env:
